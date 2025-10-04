@@ -1,5 +1,5 @@
-{{ 'custom-detail-tabs.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'custom-detail-tabs.js' | asset_url }}" defer="defer"></script>
+{{ 'custom-tabs-section.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'custom-tabs-section.js' | asset_url }}" defer="defer"></script>
 
 <custom-tabs-section id="section-{{ section.id }}" data-section-id="{{ section.id }}">
   {% if section.blocks.size > 0 %}
