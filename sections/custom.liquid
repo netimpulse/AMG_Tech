@@ -1,0 +1,361 @@
+{% comment %}
+  Custom Detail Tabs – AMG-Style
+  Sticky Pillbar, Tabs, Hero, Kachel-Grid, rechte CTA-Spalte.
+{% endcomment %}
+
+{{ 'custom-detail-tabs.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'custom-detail-tabs.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign section_id = section.id
+  assign tabs = section.blocks | where: 'type', 'tab'
+  assign tiles = section.blocks | where: 'type', 'tile'
+  assign ctas  = section.blocks | where: 'type', 'cta'
+-%}
+
+<section id="detail-tabs-{{ section_id }}"
+  class="detail-tabs"
+  style="
+    --pillbar-bg: {{ section.settings.pillbar_bg }};
+    --pillbar-text: {{ section.settings.pillbar_text }};
+    --pillbar-border: {{ section.settings.pillbar_border }};
+    --pill-text: {{ section.settings.pill_text }};
+    --pill-border: {{ section.settings.pill_border }};
+    --pill-bg: {{ section.settings.pill_bg }};
+    --pill-text-hover: {{ section.settings.pill_text_hover }};
+    --pill-border-hover: {{ section.settings.pill_border_hover }};
+    --pill-bg-hover: {{ section.settings.pill_bg_hover }};
+    --pill-text-active: {{ section.settings.pill_text_active }};
+    --pill-border-active: {{ section.settings.pill_border_active }};
+    --pill-bg-active: {{ section.settings.pill_bg_active }};
+    --ink: {{ section.settings.ink }};
+    --muted: {{ section.settings.muted }};
+    --line: {{ section.settings.line }};
+    --btn-radius: {{ section.settings.btn_radius }}px;
+    --h1-size: {{ section.settings.h1_size }}px;
+    --lead-size: {{ section.settings.lead_size }}px;
+    --body-size: {{ section.settings.body_size }}px;
+    --sticky-offset: {{ section.settings.sticky_offset }}px;
+  "
+  data-sticky="{{ section.settings.sticky | default: true }}"
+>
+  <!-- Sticky Pillbar -->
+  <nav class="pillbar" aria-label="Detailseiten">
+    <div class="container">
+      <div class="pillbar__row">
+        <div class="pillbar__label">{{ section.settings.pillbar_label }}</div>
+        <div class="pillbar__nav" id="pillbar-links-{{ section_id }}">
+          {%- for tab in tabs -%}
+            {%- assign handle = tab.settings.handle | default: tab.id | handleize -%}
+            <a class="pillbar__link"
+               href="#{{ handle }}"
+               data-target="{{ handle }}"
+               style="--pill-icon-size: {{ section.settings.pill_icon_size }}px">
+              {%- if tab.settings.icon_svg != blank -%}
+                <span class="pillbar__icon" aria-hidden="true">{{ tab.settings.icon_svg }}</span>
+              {%- elsif tab.settings.icon_image != blank -%}
+                <span class="pillbar__icon pillbar__icon--img">
+                  <img src="{{ tab.settings.icon_image | image_url: width: 64 }}" alt="" loading="lazy" width="32" height="32">
+                </span>
+              {%- else -%}
+                <span class="pillbar__icon" aria-hidden="true">{{ tab.settings.icon_emoji }}</span>
+              {%- endif -%}
+              <span class="pillbar__text">{{ tab.settings.label | escape }}</span>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {%- for tab in tabs -%}
+    {%- assign handle = tab.settings.handle | default: tab.id | handleize -%}
+    <section class="route{% if forloop.first %} is-active{% endif %}" data-route="{{ handle }}">
+      <!-- HERO -->
+      <div class="hero"
+           style="
+             --hero-start: {{ tab.settings.hero_grad_start }};
+             --hero-end: {{ tab.settings.hero_grad_end }};
+             --hero-accent: {{ tab.settings.hero_accent }};
+             --hero-text: {{ tab.settings.hero_text }};
+           ">
+        <div class="container">
+          {%- if tab.settings.crumb_prefix != blank -%}
+            <p class="crumbs">
+              {{ tab.settings.crumb_prefix }} ·
+              <span>{{ tab.settings.label }}</span>
+            </p>
+          {%- endif -%}
+          <h1 class="hero__title"
+              style="font-weight: {{ section.settings.h1_weight }};">
+            {{ tab.settings.hero_title | escape }}
+          </h1>
+          {%- if tab.settings.hero_subtitle != blank -%}
+            <p class="hero__lead">{{ tab.settings.hero_subtitle }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="container">
+        <div class="grid">
+          <!-- LEFT: Tiles -->
+          <div class="grid__main">
+            <div class="tiles">
+              {%- for tile in tiles -%}
+                {%- assign tile_tab = tile.settings.tab_ref | handleize -%}
+                {%- if tile_tab == handle -%}
+                  <article class="tile">
+                    <header class="tile__head">
+                      <div class="tile__icon">
+                        {%- if tile.settings.icon_svg != blank -%}
+                          {{ tile.settings.icon_svg }}
+                        {%- elsif tile.settings.icon_image != blank -%}
+                          <img src="{{ tile.settings.icon_image | image_url: width: 64 }}" alt="" loading="lazy" width="28" height="28">
+                        {%- else -%}
+                          {{ tile.settings.icon_emoji }}
+                        {%- endif -%}
+                      </div>
+                      <h3 class="tile__title"
+                          style="font-size: {{ tile.settings.title_size }}px;">
+                        {{ tile.settings.title | escape }}
+                      </h3>
+                    </header>
+
+                    {%- if tile.settings.body != blank -%}
+                      <div class="tile__body rte"
+                           style="font-size: {{ tile.settings.body_size }}px;">
+                        {{ tile.settings.body }}
+                      </div>
+                    {%- endif -%}
+
+                    {%- if tile.settings.checklist != blank -%}
+                      <ul class="checklist">
+                        {%- assign lines = tile.settings.checklist | split: '\n' -%}
+                        {%- for line in lines -%}
+                          {%- assign l = line | strip -%}
+                          {%- if l != '' -%}
+                            <li>
+                              <span class="checklist__icon" aria-hidden="true">✔</span>
+                              <span>{{ l }}</span>
+                            </li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+
+                    {%- if tile.settings.show_kpi -%}
+                      <div class="kpi">
+                        <div class="kpi__icon" aria-hidden="true">
+                          {%- if tile.settings.kpi_icon_svg != blank -%}
+                            {{ tile.settings.kpi_icon_svg }}
+                          {%- else -%}❄{%- endif -%}
+                        </div>
+                        <div class="kpi__text">
+                          <strong>{{ tile.settings.kpi_title }}</strong>
+                          {%- if tile.settings.kpi_sub != blank -%}
+                            <div class="kpi__sub">{{ tile.settings.kpi_sub }}</div>
+                          {%- endif -%}
+                        </div>
+                      </div>
+                    {%- endif -%}
+
+                    {%- if tile.settings.show_callout and tile.settings.callout_text != blank -%}
+                      <div class="callout">
+                        {%- if tile.settings.callout_label != blank -%}
+                          <strong>{{ tile.settings.callout_label }}:</strong>
+                        {%- endif -%}
+                        <span>{{ tile.settings.callout_text }}</span>
+                      </div>
+                    {%- endif -%}
+                  </article>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <!-- RIGHT: CTA -->
+          <aside class="grid__aside">
+            {%- for c in ctas -%}
+              {%- assign cta_tab = c.settings.tab_ref | handleize -%}
+              {%- if cta_tab == handle and c.settings.show -%}
+                <div class="cta"
+                     style="
+                       --cta-bg: {{ c.settings.bg }};
+                       --cta-text: {{ c.settings.text }};
+                       --cta-border: {{ c.settings.border }};
+                       --btn-bg: {{ c.settings.btn_bg }};
+                       --btn-text: {{ c.settings.btn_text }};
+                       --btn-bg-hover: {{ c.settings.btn_bg_hover }};
+                       --btn-text-hover: {{ c.settings.btn_text_hover }};
+                     ">
+                  {%- if c.settings.title != blank -%}
+                    <h3 class="cta__title">{{ c.settings.title }}</h3>
+                  {%- endif -%}
+                  {%- if c.settings.sub != blank -%}
+                    <p class="cta__sub">{{ c.settings.sub }}</p>
+                  {%- endif -%}
+
+                  {%- if c.settings.primary_label != blank and c.settings.primary_url != blank -%}
+                    <a class="btn btn--primary" href="{{ c.settings.primary_url }}">{{ c.settings.primary_label }}</a>
+                  {%- endif -%}
+                  {%- if c.settings.secondary_label != blank and c.settings.secondary_url != blank -%}
+                    <a class="btn btn--secondary" href="{{ c.settings.secondary_url }}">{{ c.settings.secondary_label }}</a>
+                  {%- endif -%}
+
+                  {%- if c.settings.bullets != blank -%}
+                    <hr>
+                    <ul class="iconlist">
+                      {%- assign items = c.settings.bullets | split: '\n' -%}
+                      {%- for it in items -%}
+                        {%- assign t = it | strip -%}
+                        {%- if t != '' -%}
+                          <li>
+                            <span class="iconlist__icon" aria-hidden="true">{{ c.settings.bullet_icon | default: '▣' }}</span>
+                            <span>{{ t }}</span>
+                          </li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </aside>
+        </div>
+      </div>
+    </section>
+  {%- endfor -%}
+</section>
+
+{% schema %}
+{
+  "name": "Detail-Tabs (AMG)",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "pillbar_label", "label": "Label links in der Pillbar", "default": "Detailseiten" },
+
+    { "type": "checkbox", "id": "sticky", "label": "Pillbar sticky", "default": true },
+    { "type": "range", "id": "sticky_offset", "label": "Sticky-Offset (px)", "min": 0, "max": 160, "step": 2, "default": 0 },
+
+    { "type": "color", "id": "pillbar_bg", "label": "Pillbar Hintergrund", "default": "#ffffff" },
+    { "type": "color", "id": "pillbar_text", "label": "Pillbar Text", "default": "#0f172a" },
+    { "type": "color", "id": "pillbar_border", "label": "Pillbar Unterlinie", "default": "#e5e7eb" },
+
+    { "type": "range", "id": "pill_icon_size", "label": "Icon-Größe in Tabs (px)", "min": 12, "max": 40, "step": 1, "default": 18 },
+
+    { "type": "header", "content": "Pillen Farben" },
+    { "type": "color", "id": "pill_text", "label": "Normal – Text", "default": "#0f172a" },
+    { "type": "color", "id": "pill_border", "label": "Normal – Rahmen", "default": "#e2e8f0" },
+    { "type": "color", "id": "pill_bg", "label": "Normal – Hintergrund", "default": "#ffffff" },
+
+    { "type": "color", "id": "pill_text_hover", "label": "Hover – Text", "default": "#0ea5e9" },
+    { "type": "color", "id": "pill_border_hover", "label": "Hover – Rahmen", "default": "#0ea5e9" },
+    { "type": "color", "id": "pill_bg_hover", "label": "Hover – Hintergrund", "default": "#f0f9ff" },
+
+    { "type": "color", "id": "pill_text_active", "label": "Aktiv – Text", "default": "#ffffff" },
+    { "type": "color", "id": "pill_border_active", "label": "Aktiv – Rahmen", "default": "#0ea5e9" },
+    { "type": "color", "id": "pill_bg_active", "label": "Aktiv – Hintergrund", "default": "#0ea5e9" },
+
+    { "type": "header", "content": "Typografie & Farben" },
+    { "type": "color", "id": "ink", "label": "Schriftfarbe (Body)", "default": "#0f172a" },
+    { "type": "color", "id": "muted", "label": "Muted (Zweittext)", "default": "#475569" },
+    { "type": "color", "id": "line", "label": "Linienfarbe", "default": "#e5e7eb" },
+    { "type": "range", "id": "h1_size", "label": "H1 Größe (px)", "min": 28, "max": 72, "step": 1, "default": 44 },
+    { "type": "range", "id": "h1_weight", "label": "H1 Gewicht", "min": 500, "max": 900, "step": 100, "default": 900 },
+    { "type": "range", "id": "lead_size", "label": "Lead Größe (px)", "min": 14, "max": 28, "step": 1, "default": 18 },
+    { "type": "range", "id": "body_size", "label": "Body Größe (px)", "min": 12, "max": 20, "step": 1, "default": 16 },
+    { "type": "range", "id": "btn_radius", "label": "Button-Radius (px)", "min": 0, "max": 24, "step": 1, "default": 12 }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab / Route",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Tab-Label", "default": "Metall" },
+        { "type": "text", "id": "handle", "label": "Tab-ID (für #hash)", "info": "Nur Kleinbuchstaben/Bindestriche. Leer = automatisch." },
+        { "type": "textarea", "id": "icon_svg", "label": "Icon (SVG)" },
+        { "type": "image_picker", "id": "icon_image", "label": "Icon (Bild)" },
+        { "type": "text", "id": "icon_emoji", "label": "Icon (Emoji/Fallback)", "default": "⚙" },
+
+        { "type": "text", "id": "crumb_prefix", "label": "Breadcrumb-Präfix", "default": "Strahlservice" },
+        { "type": "text", "id": "hero_title", "label": "Hero Titel", "default": "Metallverarbeitung & Produktion" },
+        { "type": "textarea", "id": "hero_subtitle", "label": "Hero Untertitel", "default": "Nicht abrasiv, keine Feuchtigkeit – minimale Ausfallzeiten." },
+
+        { "type": "color", "id": "hero_grad_start", "label": "Hero Verlauf – Start", "default": "#0b1220" },
+        { "type": "color", "id": "hero_grad_end", "label": "Hero Verlauf – Ende", "default": "#0f172a" },
+        { "type": "color", "id": "hero_accent", "label": "Hero Akzent", "default": "#0ea5e9" },
+        { "type": "color", "id": "hero_text", "label": "Hero Textfarbe", "default": "#e6f6ff" }
+      ]
+    },
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        { "type": "text", "id": "tab_ref", "label": "Tab-ID zuordnen" },
+        { "type": "textarea", "id": "icon_svg", "label": "Icon (SVG)" },
+        { "type": "image_picker", "id": "icon_image", "label": "Icon (Bild)" },
+        { "type": "text", "id": "icon_emoji", "label": "Icon (Emoji/Fallback)", "default": "🧩" },
+
+        { "type": "text", "id": "title", "label": "Titel", "default": "Gießerei & Formenbau" },
+        { "type": "range", "id": "title_size", "label": "Titelgröße (px)", "min": 14, "max": 28, "step": 1, "default": 18 },
+        { "type": "richtext", "id": "body", "label": "Text", "default": "<p>Beschreibungstext…</p>" },
+        { "type": "range", "id": "body_size", "label": "Textgröße (px)", "min": 12, "max": 20, "step": 1, "default": 16 },
+
+        { "type": "textarea", "id": "checklist", "label": "Checkliste (eine pro Zeile)" },
+
+        { "type": "checkbox", "id": "show_kpi", "label": "KPI anzeigen", "default": false },
+        { "type": "textarea", "id": "kpi_icon_svg", "label": "KPI Icon (SVG)" },
+        { "type": "text", "id": "kpi_title", "label": "KPI Titel" },
+        { "type": "text", "id": "kpi_sub", "label": "KPI Untertitel" },
+
+        { "type": "checkbox", "id": "show_callout", "label": "Callout anzeigen", "default": false },
+        { "type": "text", "id": "callout_label", "label": "Callout Label", "default": "Tipp" },
+        { "type": "textarea", "id": "callout_text", "label": "Callout Text" }
+      ]
+    },
+    {
+      "type": "cta",
+      "name": "CTA (rechte Spalte)",
+      "settings": [
+        { "type": "text", "id": "tab_ref", "label": "Tab-ID zuordnen" },
+        { "type": "checkbox", "id": "show", "label": "CTA anzeigen", "default": true },
+
+        { "type": "text", "id": "title", "label": "Titel", "default": "Strahlservice anfragen" },
+        { "type": "textarea", "id": "sub", "label": "Untertitel", "default": "Vor-Ort-Reinigung oder Mietgeräte." },
+
+        { "type": "text", "id": "primary_label", "label": "Primary Button Label", "default": "Beratung" },
+        { "type": "url", "id": "primary_url", "label": "Primary Button Link" },
+
+        { "type": "text", "id": "secondary_label", "label": "Secondary Button Label", "default": "Mietgeräte" },
+        { "type": "url", "id": "secondary_url", "label": "Secondary Button Link" },
+
+        { "type": "textarea", "id": "bullets", "label": "Bulletliste (eine pro Zeile)" },
+        { "type": "text", "id": "bullet_icon", "label": "Bullet Icon", "default": "▣" },
+
+        { "type": "color", "id": "bg", "label": "Box Hintergrund", "default": "#ffffff" },
+        { "type": "color", "id": "text", "label": "Box Text", "default": "#0f172a" },
+        { "type": "color", "id": "border", "label": "Box Rahmen", "default": "#e5e7eb" },
+
+        { "type": "color", "id": "btn_bg", "label": "Primary Button – Hintergrund", "default": "#0ea5e9" },
+        { "type": "color", "id": "btn_text", "label": "Primary Button – Text", "default": "#ffffff" },
+        { "type": "color", "id": "btn_bg_hover", "label": "Primary Button – Hintergrund Hover", "default": "#0284c7" },
+        { "type": "color", "id": "btn_text_hover", "label": "Primary Button – Text Hover", "default": "#ffffff" }
+      ]
+    }
+  ],
+  "max_blocks": 100,
+  "presets": [
+    {
+      "name": "Detail-Tabs (AMG)",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "Metall", "handle": "metall" } },
+        { "type": "cta", "settings": { "tab_ref": "metall", "title": "Strahlservice anfragen" } },
+        { "type": "tile", "settings": { "tab_ref": "metall", "title": "Gießerei & Formenbau", "icon_emoji": "🧱" } },
+        { "type": "tile", "settings": { "tab_ref": "metall", "title": "Automobil", "icon_emoji": "🚗" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
