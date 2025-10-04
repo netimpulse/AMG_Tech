@@ -1,8 +1,12 @@
 {{ 'custom-tabs-section.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'custom-tabs-section.js' | asset_url }}" defer="defer"></script>
 
+{%- liquid
+  assign tabs = section.blocks | where: "type", "tab"
+-%}
+
 <custom-tabs-section id="section-{{ section.id }}" data-section-id="{{ section.id }}">
-  {% if section.blocks.size > 0 %}
+  {% if tabs.size > 0 %}
     <nav class="pillbar" style="--pill-bg: {{ section.settings.pill_bg }}; --pill-hover-bg: {{ section.settings.pill_hover_bg }}; --pill-active-bg: {{ section.settings.pill_active_bg }}; --pill-text: {{ section.settings.pill_text_color }}; --pill-active-text: {{ section.settings.pill_active_text_color }}; top: {{ section.settings.sticky_top_position }}px;">
       <div class="container py-2">
         <div class="d-flex flex-wrap align-items-center">
@@ -10,7 +14,7 @@
             <div class="me-2 fw-bold" style="color: {{ section.settings.pillbar_title_color }};">{{ section.settings.pillbar_title }}</div>
           {% endif %}
           <div class="nav">
-            {% for block in section.blocks %}
+            {% for block in tabs %}
               <a class="nav-link {% if forloop.first %}active{% endif %}" href="#{{ block.id }}">
                 {% if block.settings.icon != blank %}<i class="{{ block.settings.icon }} me-1"></i>{% endif %}
                 {{ block.settings.title }}
@@ -23,69 +27,85 @@
   {% endif %}
 
   {% for block in section.blocks %}
-    <section class="route-detail {% if forloop.first %}active{% endif %}" data-route="{{ block.id }}">
-      <div class="hero-band" style="--hero-bg-start: {{ block.settings.hero_bg_start }}; --hero-bg-end: {{ block.settings.hero_bg_end }};">
-        <div class="container py-5">
-          {% if block.settings.hero_breadcrumb != blank %}
-            <p class="crumbs small mb-2" style="color: {{ block.settings.hero_text_color | color_modify: 'alpha', 0.8 }};">
-              {{ block.settings.hero_breadcrumb }}
-            </p>
-          {% endif %}
-          <h1 class="display-5 mb-2" style="color: {{ block.settings.hero_text_color }};">{{ block.settings.hero_title }}</h1>
-          {% if block.settings.hero_subtitle != blank %}
-            <p class="lead" style="color: {{ block.settings.hero_text_color | color_modify: 'alpha', 0.9 }};">
-              {{ block.settings.hero_subtitle }}
-            </p>
-          {% endif %}
-        </div>
-      </div>
-      <div class="container py-5">
-        <div class="row g-4">
-          <div class="col-lg-8">
-            <div class="row g-3 grid-tiles">
-              {% for tile in block.settings.tiles %}
-                 {% endfor %}
-               <div class="col-md-6"><div class="tile w-100 h-100"><h5><i class="bi bi-cast me-2"></i> {{ block.settings.tile_1_title }}</h5><p>{{ block.settings.tile_1_text }}</p></div></div>
-               <div class="col-md-6"><div class="tile w-100 h-100"><h5><i class="bi bi-airplane-engines me-2"></i> {{ block.settings.tile_2_title }}</h5><p>{{ block.settings.tile_2_text }}</p></div></div>
-               <div class="col-md-6"><div class="tile w-100 h-100"><h5><i class="bi bi-car-front me-2"></i> {{ block.settings.tile_3_title }}</h5><p>{{ block.settings.tile_3_text }}</p></div></div>
-               <div class="col-md-6"><div class="tile w-100 h-100"><h5><i class="bi bi-lightning-charge me-2"></i> {{ block.settings.tile_4_title }}</h5><p>{{ block.settings.tile_4_text }}</p></div></div>
+    {% if block.type == 'tab' %}
+      {% if forloop.first == false %}
             </div>
           </div>
-          {% if block.settings.show_cta %}
+          {%- if cta_block -%}
             <div class="col-lg-4">
               <div class="aside">
                 <div class="p-4 bg-white info-card shadow-sm">
-                  {% if block.settings.cta_title != blank %}
-                    <h5 class="mb-2">{{ block.settings.cta_title }}</h5>
-                  {% endif %}
-                  {% if block.settings.cta_subtitle != blank %}
-                    <p class="small text-muted">{{ block.settings.cta_subtitle }}</p>
-                  {% endif %}
-                  {% if block.settings.cta_button_1_text != blank %}
-                    <a class="btn btn-primary w-100 mb-2" href="{{ block.settings.cta_button_1_link }}" style="--c-primary: {{ block.settings.cta_btn1_bg }}; --c-primary-600: {{ block.settings.cta_btn1_hover_bg }}; color: {{ block.settings.cta_btn1_text_color }};">{{ block.settings.cta_button_1_text }}</a>
-                  {% endif %}
-                  {% if block.settings.cta_button_2_text != blank %}
-                    <a class="btn btn-outline-secondary w-100" href="{{ block.settings.cta_button_2_link }}" style="--c-muted: {{ block.settings.cta_btn2_border_color }}; color: {{ block.settings.cta_btn2_text_color }};">{{ block.settings.cta_button_2_text }}</a>
-                  {% endif %}
-                  {% if block.settings.cta_info_text != blank %}
-                    <hr>
-                    <ul class="list-unstyled small m-0">
-                      <li class="icon-bullet"><i class="bi bi-droplet"></i><span>{{ block.settings.cta_info_text }}</span></li>
-                    </ul>
-                  {% endif %}
+                  {% if cta_block.settings.cta_title != blank %} <h5 class="mb-2">{{ cta_block.settings.cta_title }}</h5> {% endif %}
+                  {% if cta_block.settings.cta_subtitle != blank %} <p class="small text-muted">{{ cta_block.settings.cta_subtitle }}</p> {% endif %}
+                  {% if cta_block.settings.cta_button_1_text != blank %} <a class="btn btn-primary w-100 mb-2" href="{{ cta_block.settings.cta_button_1_link }}" style="--c-primary: {{ cta_block.settings.cta_btn1_bg }}; --c-primary-600: {{ cta_block.settings.cta_btn1_hover_bg }}; color: {{ cta_block.settings.cta_btn1_text_color }};">{{ cta_block.settings.cta_button_1_text }}</a> {% endif %}
+                  {% if cta_block.settings.cta_button_2_text != blank %} <a class="btn btn-outline-secondary w-100" href="{{ cta_block.settings.cta_button_2_link }}" style="--c-muted: {{ cta_block.settings.cta_btn2_border_color }}; color: {{ cta_block.settings.cta_btn2_text_color }};">{{ cta_block.settings.cta_button_2_text }}</a> {% endif %}
+                  {% if cta_block.settings.cta_info_text != blank %} <hr> <ul class="list-unstyled small m-0"><li class="icon-bullet"><i class="bi bi-droplet"></i><span>{{ cta_block.settings.cta_info_text }}</span></li></ul> {% endif %}
                 </div>
               </div>
             </div>
-          {% endif %}
+          {%- endif -%}
         </div>
       </div>
     </section>
+      {% endif %}
+
+      {%- assign cta_block = block -%}
+      <section class="route-detail {% if forloop.first %}active{% endif %}" data-route="{{ block.id }}">
+        <div class="hero-band" style="--hero-bg-start: {{ block.settings.hero_bg_start }}; --hero-bg-end: {{ block.settings.hero_bg_end }};">
+          <div class="container py-5">
+            {% if block.settings.hero_breadcrumb != blank %}<p class="crumbs small mb-2" style="color: {{ block.settings.hero_text_color | color_modify: 'alpha', 0.8 }};">{{ block.settings.hero_breadcrumb }}</p>{% endif %}
+            <h1 class="display-5 mb-2" style="color: {{ block.settings.hero_text_color }};">{{ block.settings.hero_title }}</h1>
+            {% if block.settings.hero_subtitle != blank %}<p class="lead" style="color: {{ block.settings.hero_text_color | color_modify: 'alpha', 0.9 }};">{{ block.settings.hero_subtitle }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="container py-5">
+          <div class="row g-4">
+            <div class="col-lg-{% if block.settings.show_cta %}8{% else %}12{% endif %}">
+              <div class="row g-3 grid-tiles">
+    {% elsif block.type == 'tile' %}
+      <div class="col-md-6">
+        <div class="tile w-100 h-100">
+          <h5 class="mb-2">
+            {%- if block.settings.icon_image != blank -%}
+              <img src="{{ block.settings.icon_image | image_url: width: 80 }}" alt="{{ block.settings.icon_image.alt | escape }}" class="tile-icon-image me-2" loading="lazy">
+            {%- elsif block.settings.icon_class != blank -%}
+              <i class="{{ block.settings.icon_class }} me-2"></i>
+            {%- endif -%}
+            {{ block.settings.title }}
+          </h5>
+          <div class="tile-text">{{ block.settings.text }}</div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if forloop.last %}
+        </div>
+      </div>
+      {%- if cta_block and cta_block.settings.show_cta -%}
+        <div class="col-lg-4">
+          <div class="aside">
+            <div class="p-4 bg-white info-card shadow-sm">
+              {% if cta_block.settings.cta_title != blank %} <h5 class="mb-2">{{ cta_block.settings.cta_title }}</h5> {% endif %}
+              {% if cta_block.settings.cta_subtitle != blank %} <p class="small text-muted">{{ cta_block.settings.cta_subtitle }}</p> {% endif %}
+              {% if cta_block.settings.cta_button_1_text != blank %} <a class="btn btn-primary w-100 mb-2" href="{{ cta_block.settings.cta_button_1_link }}" style="--c-primary: {{ cta_block.settings.cta_btn1_bg }}; --c-primary-600: {{ cta_block.settings.cta_btn1_hover_bg }}; color: {{ cta_block.settings.cta_btn1_text_color }};">{{ cta_block.settings.cta_button_1_text }}</a> {% endif %}
+              {% if cta_block.settings.cta_button_2_text != blank %} <a class="btn btn-outline-secondary w-100" href="{{ cta_block.settings.cta_button_2_link }}" style="--c-muted: {{ cta_block.settings.cta_btn2_border_color }}; color: {{ cta_block.settings.cta_btn2_text_color }};">{{ cta_block.settings.cta_button_2_text }}</a> {% endif %}
+              {% if cta_block.settings.cta_info_text != blank %} <hr> <ul class="list-unstyled small m-0"><li class="icon-bullet"><i class="bi bi-droplet"></i><span>{{ cta_block.settings.cta_info_text }}</span></li></ul> {% endif %}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+      </div>
+    </div>
+  </section>
+    {% endif %}
   {% endfor %}
 </custom-tabs-section>
+
 
 {% schema %}
 {
   "name": "Custom Tabs Section",
+  "max_blocks": 30,
   "settings": [
     {
       "type": "header",
@@ -152,98 +172,35 @@
     {
       "type": "tab",
       "name": "Tab Content",
+      "limit": 8,
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Dies ist ein Tab. Füge 'Kachel'-Blöcke direkt unter diesem Block hinzu, um sie hier anzuzeigen."
+        },
         {
           "type": "header",
           "content": "Navigation Pill"
         },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Pill Titel",
-          "default": "Tab Title"
-        },
-        {
-          "type": "text",
-          "id": "icon",
-          "label": "Bootstrap Icon Klasse",
-          "info": "z.B. 'bi bi-gear'",
-          "default": "bi bi-gear"
-        },
+        { "type": "text", "id": "title", "label": "Pill Titel", "default": "Tab Title" },
+        { "type": "text", "id": "icon", "label": "Bootstrap Icon Klasse", "info": "z.B. 'bi bi-gear'", "default": "bi bi-gear" },
         {
           "type": "header",
           "content": "Hero Banner"
         },
-        {
-          "type": "text",
-          "id": "hero_breadcrumb",
-          "label": "Breadcrumb Text",
-          "default": "Strahlservice · Metall & Produktion"
-        },
-        {
-          "type": "text",
-          "id": "hero_title",
-          "label": "Hauptüberschrift",
-          "default": "Metallverarbeitung & Produktion"
-        },
-        {
-          "type": "text",
-          "id": "hero_subtitle",
-          "label": "Unterüberschrift",
-          "default": "Nicht abrasiv, keine Feuchtigkeit – minimale Ausfallzeiten."
-        },
-        {
-          "type": "color",
-          "id": "hero_text_color",
-          "label": "Textfarbe",
-          "default": "#e6f6ff"
-        },
-        {
-          "type": "color",
-          "id": "hero_bg_start",
-          "label": "Hintergrund Start",
-          "default": "#0b1220"
-        },
-        {
-          "type": "color",
-          "id": "hero_bg_end",
-          "label": "Hintergrund Ende",
-          "default": "#0f172a"
-        },
+        { "type": "text", "id": "hero_breadcrumb", "label": "Breadcrumb Text", "default": "Strahlservice · Metall & Produktion" },
+        { "type": "text", "id": "hero_title", "label": "Hauptüberschrift", "default": "Metallverarbeitung & Produktion" },
+        { "type": "text", "id": "hero_subtitle", "label": "Unterüberschrift", "default": "Nicht abrasiv, keine Feuchtigkeit – minimale Ausfallzeiten." },
+        { "type": "color", "id": "hero_text_color", "label": "Textfarbe", "default": "#e6f6ff" },
+        { "type": "color", "id": "hero_bg_start", "label": "Hintergrund Start", "default": "#0b1220" },
+        { "type": "color", "id": "hero_bg_end", "label": "Hintergrund Ende", "default": "#0f172a" },
         {
           "type": "header",
-          "content": "Content Kacheln"
+          "content": "CTA Sidebar (für diesen Tab)"
         },
-        { "type": "text", "id": "tile_1_title", "label": "Kachel 1 Titel", "default": "Gießerei & Formenbau" },
-        { "type": "text", "id": "tile_1_text", "label": "Kachel 1 Text", "default": "Geometrien bleiben erhalten (~2 Mohs)." },
-        { "type": "text", "id": "tile_2_title", "label": "Kachel 2 Titel", "default": "Luftfahrt" },
-        { "type": "text", "id": "tile_2_text", "label": "Kachel 2 Text", "default": "Bremsstaub, Silikon, Epoxid, Graphit entfernen." },
-        { "type": "text", "id": "tile_3_title", "label": "Kachel 3 Titel", "default": "Automobil" },
-        { "type": "text", "id": "tile_3_text", "label": "Kachel 3 Text", "default": "Formen/Roboter/Extruder – ohne Demontage." },
-        { "type": "text", "id": "tile_4_title", "label": "Kachel 4 Titel", "default": "Elektromotoren" },
-        { "type": "text", "id": "tile_4_text", "label": "Kachel 4 Text", "default": "Öl & Zellstoff raus, Isolation bleibt intakt." },
-        {
-          "type": "header",
-          "content": "CTA Sidebar"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_cta",
-          "label": "CTA Sidebar anzeigen?",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "cta_title",
-          "label": "CTA Titel",
-          "default": "Strahlservice anfragen"
-        },
-        {
-          "type": "text",
-          "id": "cta_subtitle",
-          "label": "CTA Untertitel",
-          "default": "Vor-Ort-Reinigung oder Mietgeräte."
-        },
+        { "type": "checkbox", "id": "show_cta", "label": "CTA Sidebar anzeigen?", "default": true },
+        { "type": "text", "id": "cta_title", "label": "CTA Titel", "default": "Strahlservice anfragen" },
+        { "type": "text", "id": "cta_subtitle", "label": "CTA Untertitel", "default": "Vor-Ort-Reinigung oder Mietgeräte." },
         { "type": "text", "id": "cta_button_1_text", "label": "Button 1 Text", "default": "Beratung" },
         { "type": "url", "id": "cta_button_1_link", "label": "Button 1 Link" },
         { "type": "color", "id": "cta_btn1_bg", "label": "Button 1 Hintergrund", "default": "#0ea5e9" },
@@ -255,6 +212,36 @@
         { "type": "color", "id": "cta_btn2_text_color", "label": "Button 2 Textfarbe", "default": "#0f172a" },
         { "type": "text", "id": "cta_info_text", "label": "Info Text unter Buttons", "default": "Kein Wasser, keine Chemie" }
       ]
+    },
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon-Bild (optional)"
+        },
+        {
+          "type": "text",
+          "id": "icon_class",
+          "label": "Oder: Bootstrap Icon Klasse",
+          "info": "Wird nur angezeigt, wenn kein Bild ausgewählt ist. z.B. 'bi bi-cast'",
+          "default": "bi bi-cast"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titel der Kachel",
+          "default": "Kachel Titel"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text der Kachel",
+          "default": "<p>Hier steht der Beschreibungstext für die Kachel.</p>"
+        }
+      ]
     }
   ],
   "presets": [
@@ -262,7 +249,10 @@
       "name": "Custom Tabs Section",
       "blocks": [
         { "type": "tab" },
-        { "type": "tab" }
+        { "type": "tile", "settings": { "title": "Gießerei & Formenbau", "text": "<p>Geometrien bleiben erhalten (~2 Mohs).</p>"}},
+        { "type": "tile", "settings": { "icon_class": "bi bi-airplane-engines", "title": "Luftfahrt", "text": "<p>Bremsstaub, Silikon, Epoxid, Graphit entfernen.</p>"}},
+        { "type": "tab", "settings": { "title": "Ein anderer Tab" } },
+        { "type": "tile", "settings": { "title": "Erste Kachel für Tab 2" }}
       ]
     }
   ]
