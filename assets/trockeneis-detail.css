@@ -16,14 +16,13 @@
 }
 
 .te-detail {
-  /* Dynamische Variablen werden über JS gesetzt */
-  font-size: var(--fs-base);
-  color: var(--color-body);
+  font-size: var(--fs-base, 16px);
+  color: var(--color-body, #0f172a);
 }
-.te-h1{ font-size: var(--fs-h1); font-weight: 900; color: var(--color-head); margin: 0 0 8px; }
+.te-h1{ font-size: var(--fs-h1, 44px); font-weight: 900; color: var(--color-head, #0f172a); margin: 0 0 8px; }
 .te-h5{ font-size: 20px; font-weight: 800; margin: 0 0 8px; }
-.te-h6{ font-size: var(--fs-h3); font-weight: 800; margin: 0 0 8px; }
-.te-lead{ color: var(--hero-text); opacity: .9; }
+.te-h6{ font-size: var(--fs-h3, 22px); font-weight: 800; margin: 0 0 8px; }
+.te-lead{ color: var(--hero-text, #e6f6ff); opacity: .9; }
 
 .te-pillbar { 
   position: relative; top: 0; z-index: 30; background: #ffffffcc; backdrop-filter: blur(8px); border-bottom: 1px solid var(--te-line); 
@@ -36,19 +35,19 @@
 .te-pill {
   display:inline-flex; align-items:center; gap:8px;
   padding: 7px 14px; border-radius: 999px; text-decoration:none;
-  background: var(--pill-normal-bg); color: var(--pill-normal-text); border: 1px solid var(--pill-border-color);
+  background: var(--pill-normal-bg, #ffffff); color: var(--pill-normal-text, #0f172a); border: 1px solid var(--pill-border-color, #E0E0E0);
   transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
   line-height: 1;
 }
 .te-pill:hover { 
-  background: var(--pill-hover-bg); color: var(--pill-hover-text); 
+  background: var(--pill-hover-bg, #e6f6ff); color: var(--pill-hover-text, #0284c7); 
   transform: translateY(-1px);
 }
-.te-pill.is-active { background: var(--pill-active-bg); color: var(--pill-active-text); border-color: var(--pill-active-bg); }
+.te-pill.is-active { background: var(--pill-active-bg, #0ea5e9); color: var(--pill-active-text, #ffffff); border-color: var(--pill-active-bg, #0ea5e9); }
 
 .te-hero-band {
-  background: linear-gradient(180deg, var(--hero-start) 0%, var(--hero-end) 100%);
-  color: var(--hero-text);
+  background: linear-gradient(180deg, var(--hero-start, #0b1220) 0%, var(--hero-end, #0f172a) 100%);
+  color: var(--hero-text, #e6f6ff);
   padding: 48px 0;
 }
 .te-breadcrumb.small { opacity:.9; margin: 0 0 8px; }
@@ -67,7 +66,7 @@
 .te-icon-check::after { content:''; position:absolute; inset: 4px 5px 4px 5px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform: rotate(45deg); }
 
 .te-kpi { display:flex; align-items:center; gap:12px; padding: 10px 12px; border:1px solid var(--te-line); border-radius: 12px; background:#f8fafc; margin-top: 10px; }
-.te-callout { margin-top: 10px; border-left: 4px solid var(--pill-active-bg); background: #effaff; border-radius: 6px; padding: 10px 12px; }
+.te-callout { margin-top: 10px; border-left: 4px solid var(--pill-active-bg, #0ea5e9); background: #effaff; border-radius: 6px; padding: 10px 12px; }
 
 .te-feature { border:1px solid var(--te-line); border-radius: var(--te-radius); padding: 16px; background:#fff; margin-top: 16px; }
 .te-feature--inline { padding: 8px 12px; }
@@ -75,7 +74,7 @@
 .te-aside__card { border:1px solid var(--te-line); border-radius: var(--te-radius); background:#fff; padding: 16px; box-shadow: var(--te-shadow); position: sticky; top: 88px; }
 .te-aside__list { list-style:none; padding:0; margin: 10px 0 0; display:grid; gap:6px; }
 .te-aside__list li { display: flex; gap: 8px; align-items: flex-start; }
-.te-icon-bullet { width: 6px; height: 6px; border-radius: 999px; background: var(--pill-active-bg); display:inline-block; margin-top: 8px; flex-shrink: 0; }
+.te-icon-bullet { width: 6px; height: 6px; border-radius: 999px; background: var(--pill-active-bg, #0ea5e9); display:inline-block; margin-top: 8px; flex-shrink: 0; }
 
 .te-btn { display:inline-flex; align-items:center; justify-content:center; padding: 10px 14px; border-radius: 12px; text-decoration:none; font-weight: 700; margin-bottom: 10px; }
 .te-btn--primary { background: var(--btn-bg, #0ea5e9); color: var(--btn-text, #fff); border: 1px solid var(--btn-bg, #0ea5e9); }
