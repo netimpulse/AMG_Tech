@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const d = root.dataset;
 
     // Typography
-    root.style.setProperty('--fs-base', (d.fsBase || d.fsBase === '0') ? `${d.fsBase}px` : `${d.fsBase}px`);
+    root.style.setProperty('--fs-base', (d.fsBase || d.fsBase === '0') ? `${d.fsBase}px` : `16px`);
     root.style.setProperty('--fs-h1', `${d.fsH1}px`);
     root.style.setProperty('--fs-h2', `${d.fsH2}px`);
     root.style.setProperty('--fs-h3', `${d.fsH3}px`);
@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const getPills = () => [...root.querySelectorAll('.te-pill')];
 
   const activate = (handle) => {
-    // remove hash '#'
     const h = (handle || '').replace('#','');
     const tabs = getTabs();
     const pills = getPills();
@@ -62,16 +61,20 @@ document.addEventListener('DOMContentLoaded', () => {
       p.setAttribute('aria-selected', isAct ? 'true' : 'false');
     });
 
-    // update hash without jumping
-    if (target && window.location.hash !== `#${target.dataset.route}`) {
-      history.replaceState(null, '', `#${target.dataset.route}`);
-    }
+    if (target) {
+        const newHash = `#${target.dataset.route}`;
+        if (window.location.hash !== newHash) {
+            history.replaceState(null, '', newHash);
+        }
 
-    // scroll to top of section (keine harte Animation in Editor)
-    const pillbar = root.querySelector('.te-pillbar');
-    const offset = parseInt(root.dataset.stickyOffset || '0', 10);
-    const y = root.getBoundingClientRect().top + window.scrollY - (pillbar?.offsetHeight || 0) - offset;
-    window.scrollTo({ top: y, behavior: 'smooth' });
+        // scroll to top of section (but not in theme editor preview)
+        if (!(window.Shopify && window.Shopify.designMode)) {
+            const pillbar = root.querySelector('.te-pillbar');
+            const offset = parseInt(root.dataset.stickyOffset || '0', 10);
+            const y = root.getBoundingClientRect().top + window.scrollY - (pillbar?.offsetHeight || 0) - offset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+    }
   };
 
   // Events
@@ -86,12 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init
   applyVars();
-  // On theme editor change, re-apply vars (Shopify Editor triggers re-render, but safe):
-  document.addEventListener('shopify:section:load', applyVars);
-  document.addEventListener('shopify:section:reorder', applyVars);
-  document.addEventListener('shopify:block:select', applyVars);
-  document.addEventListener('shopify:block:deselect', applyVars);
+
+  // On theme editor change, re-apply vars
+  if (window.Shopify && window.Shopify.designMode) {
+    document.addEventListener('shopify:section:load', applyVars);
+    document.addEventListener('shopify:section:reorder', applyVars);
+  }
 
   // initial tab from hash or first
-  activate(location.hash || null);
+  activate(location.hash || getPills()[0]?.getAttribute('href'));
 });
