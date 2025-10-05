@@ -1,0 +1,354 @@
+{%- comment -%}
+  Section: Trockeneis Detail-Tabs
+  - Tabs via Blocktyp "tab"
+  - Inhalt über Blocks "tile", "kpi", "feature", "sidebar"
+  - Zuordnung: jedes Inhalts-Block referenziert eine Tab-"Kennung" (tab_handle)
+  - Sticky Pillbar, aktiver Tab über URL-Hash (#handle) & Editor-Preview
+  - Benötigt: assets/trockeneis-detail.css + assets/trockeneis-detail.js
+
+  STRICT LIQUID EDITS:
+  - Whitespace control (`{%- ... -%}`) has been added throughout the file
+    to produce cleaner, more efficient HTML by removing excess whitespace
+    from the Liquid output. Functionality remains identical.
+{%- endcomment -%}
+
+{{ 'trockeneis-detail.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'trockeneis-detail.js' | asset_url }}" defer="defer"></script>
+
+<section
+  id="te-detail-{{ section.id }}"
+  class="te-detail"
+  data-sticky="{{ section.settings.sticky }}"
+  data-sticky-offset="{{ section.settings.sticky_offset }}"
+  data-pill-normal-bg="{{ section.settings.pill_bg }}"
+  data-pill-normal-text="{{ section.settings.pill_text }}"
+  data-pill-border="{{ section.settings.pill_border }}"
+  data-pill-hover-bg="{{ section.settings.pill_hover_bg }}"
+  data-pill-hover-text="{{ section.settings.pill_hover_text }}"
+  data-pill-active-bg="{{ section.settings.pill_active_bg }}"
+  data-pill-active-text="{{ section.settings.pill_active_text }}"
+  data-hero-start="{{ section.settings.hero_start }}"
+  data-hero-end="{{ section.settings.hero_end }}"
+  data-hero-text="{{ section.settings.hero_text }}"
+  data-font-body="{{ section.settings.font_family_body }}"
+  data-font-head="{{ section.settings.font_family_head }}"
+  data-fs-base="{{ section.settings.fs_base }}"
+  data-fs-h1="{{ section.settings.fs_h1 }}"
+  data-fs-h2="{{ section.settings.fs_h2 }}"
+  data-fs-h3="{{ section.settings.fs_h3 }}"
+  data-color-body="{{ section.settings.color_body }}"
+  data-color-head="{{ section.settings.color_head }}"
+>
+  {%- assign tabs = section.blocks | where: 'type', 'tab' -%}
+
+  <!-- Sticky Pillbar -->
+  <nav class="te-pillbar" aria-label="{{ section.settings.nav_label | escape }}">
+    <div class="te-container">
+      <div class="te-pillbar__wrap">
+        <div class="te-pillbar__title">{{ section.settings.nav_prefix }}</div>
+        <div class="te-pillbar__pills" role="tablist">
+          {%- for t in tabs -%}
+            {%- assign handle = t.settings.handle | handleize -%}
+            <a
+              class="te-pill"
+              role="tab"
+              aria-selected="false"
+              href="#{{ handle }}"
+              data-tab="{{ handle }}"
+            >
+              {%- if t.settings.icon != blank -%}
+                <i class="{{ t.settings.icon }}"></i>
+              {%- endif -%}
+              <span>{{ t.settings.label }}</span>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Tab-Panels -->
+  {%- for t in tabs -%}
+    {%- assign handle = t.settings.handle | handleize -%}
+    <div class="te-tab route route-detail" id="{{ handle }}" data-route="{{ handle }}" role="tabpanel" aria-labelledby="{{ handle }}-pill">
+      <!-- Hero -->
+      <div class="te-hero-band">
+        <div class="te-container">
+          <p class="te-breadcrumb small">
+            {%- if t.settings.breadcrumb_parent != blank -%}
+              {{ t.settings.breadcrumb_parent }} ·
+            {%- endif -%}
+            <span>{{ t.settings.label }}</span>
+          </p>
+          <h1 class="te-h1">{{ t.settings.title }}</h1>
+          {%- if t.settings.subtitle != blank -%}
+            <p class="te-lead">{{ t.settings.subtitle }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="te-container te-section">
+        <div class="te-grid">
+          <!-- Main -->
+          <div class="te-main">
+            <div class="te-tiles">
+              {%- comment -%}
+                Render all blocks that target this tab_handle
+              {%- endcomment -%}
+              {%- for b in section.blocks -%}
+                {%- assign b_tab_handle = b.settings.tab_handle | handleize -%}
+                {%- if b.type == 'tile' and b.settings.tab_handle != blank and b_tab_handle == handle -%}
+                  <div class="te-tile">
+                    <h5 class="te-tile__title">
+                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                      {{ b.settings.title }}
+                    </h5>
+                    {%- if b.settings.text != blank -%}
+                      <div class="te-tile__text rte">{{ b.settings.text }}</div>
+                    {%- endif -%}
+                    {%- if b.settings.checklist != blank -%}
+                      <ul class="te-checklist">
+                        {%- assign items = b.settings.checklist | newline_to_br | split: '<br />' -%}
+                        {%- for i in items -%}
+                          {%- if i != blank -%}
+                            <li><i class="te-icon-check"></i><span>{{ i | strip }}</span></li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                    {%- if b.settings.kpi_enable -%}
+                      <div class="te-kpi">
+                        {%- if b.settings.kpi_icon != blank -%}<i class="{{ b.settings.kpi_icon }}"></i>{%- endif -%}
+                        <div>
+                          <strong>{{ b.settings.kpi_title }}</strong>
+                          {%- if b.settings.kpi_sub != blank -%}
+                            <div class="small">{{ b.settings.kpi_sub }}</div>
+                          {%- endif -%}
+                        </div>
+                      </div>
+                    {%- endif -%}
+                    {%- if b.settings.callout_enable -%}
+                      <div class="te-callout">
+                        <strong>{{ b.settings.callout_title }}</strong>
+                        {%- if b.settings.callout_text != blank -%}
+                          <span> – {{ b.settings.callout_text }}</span>
+                        {%- endif -%}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+
+                {%- if b.type == 'kpi' and b_tab_handle == handle -%}
+                  <div class="te-feature te-feature--inline">
+                    <div class="te-kpi">
+                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                      <div>
+                        <strong>{{ b.settings.title }}</strong>
+                        {%- if b.settings.sub != blank -%}<div class="small">{{ b.settings.sub }}</div>{%- endif -%}
+                      </div>
+                    </div>
+                  </div>
+                {%- endif -%}
+
+                {%- if b.type == 'feature' and b_tab_handle == handle -%}
+                  <div class="te-feature">
+                    <h6 class="te-h6">
+                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                      {{ b.settings.title }}
+                    </h6>
+                    {%- if b.settings.items != blank -%}
+                      <ul class="te-checklist">
+                        {%- assign lines = b.settings.items | newline_to_br | split: '<br />' -%}
+                        {%- for line in lines -%}
+                          {%- if line != blank -%}
+                            <li><i class="te-icon-check"></i><span>{{ line | strip }}</span></li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <!-- Aside (CTA pro Tab via Blocktype "sidebar") -->
+          <aside class="te-aside">
+            {%- assign sidebars = section.blocks | where: 'type', 'sidebar' -%}
+            {%- for s in sidebars -%}
+              {%- assign s_tab_handle = s.settings.tab_handle | handleize -%}
+              {%- if s_tab_handle == handle and s.settings.show_sidebar -%}
+                <div class="te-aside__card">
+                  <h5 class="te-h5">{{ s.settings.title }}</h5>
+                  {%- if s.settings.text != blank -%}
+                    <p class="small te-muted">{{ s.settings.text }}</p>
+                  {%- endif -%}
+                  {%- if s.settings.btn1_label != blank -%}
+                    <a class="te-btn te-btn--primary w-100" href="{{ s.settings.btn1_link }}" style="--btn-bg: {{ s.settings.btn1_bg }}; --btn-text: {{ s.settings.btn1_text }};">{{ s.settings.btn1_label }}</a>
+                  {%- endif -%}
+                  {%- if s.settings.btn2_label != blank -%}
+                    <a class="te-btn te-btn--outline w-100" href="{{ s.settings.btn2_link }}" style="--btn-outline: {{ s.settings.btn2_outline }}; --btn-text: {{ s.settings.btn2_text }};">{{ s.settings.btn2_label }}</a>
+                  {%- endif -%}
+                  {%- if s.settings.list != blank -%}
+                    <hr>
+                    <ul class="te-aside__list small">
+                      {%- assign sitems = s.settings.list | newline_to_br | split: '<br />' -%}
+                      {%- for li in sitems -%}
+                        {%- if li != blank -%}
+                          <li><i class="te-icon-bullet"></i><span>{{ li | strip }}</span></li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </aside>
+        </div>
+      </div>
+    </div>
+  {%- endfor -%}
+</section>
+
+{% schema %}
+{
+  "name": "Trockeneis – Detail-Tabs",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "nav_label", "label": "ARIA-Label Navigation", "default": "Detail-Navigation" },
+    { "type": "text", "id": "nav_prefix", "label": "Prefix in Pill-Leiste", "default": "Detailseiten" },
+    { "type": "checkbox", "id": "sticky", "label": "Pill-Leiste sticky", "default": true },
+    { "type": "range", "id": "sticky_offset", "label": "Sticky Offset (px)", "default": 0, "min": 0, "max": 100, "step": 1 },
+    { "type": "header", "content": "Pill-Farben" },
+    { "type": "color", "id": "pill_bg", "label": "Normal – Hintergrund", "default": "#ffffff" },
+    { "type": "color", "id": "pill_text", "label": "Normal – Text", "default": "#0f172a" },
+    { "type": "color", "id": "pill_border", "label": "Normal – Rahmen", "default": "#E0E0E0" },
+    { "type": "color", "id": "pill_hover_bg", "label": "Hover – Hintergrund", "default": "#e6f6ff" },
+    { "type": "color", "id": "pill_hover_text", "label": "Hover – Text", "default": "#0284c7" },
+    { "type": "color", "id": "pill_active_bg", "label": "Aktiv – Hintergrund", "default": "#0ea5e9" },
+    { "type": "color", "id": "pill_active_text", "label": "Aktiv – Text", "default": "#ffffff" },
+    { "type": "header", "content": "Hero-Band Farben" },
+    { "type": "color", "id": "hero_start", "label": "Hero Verlauf Start", "default": "#0b1220" },
+    { "type": "color", "id": "hero_end", "label": "Hero Verlauf Ende", "default": "#0f172a" },
+    { "type": "color", "id": "hero_text", "label": "Hero Text", "default": "#e6f6ff" },
+    { "type": "header", "content": "Typografie" },
+    {
+      "type": "select",
+      "id": "font_family_body",
+      "label": "Body Font (Klasse)",
+      "default": "font-body",
+      "options": [
+        { "value": "font-body", "label": "Theme-Body" },
+        { "value": "font-sans", "label": "Sans-Serif" },
+        { "value": "font-serif", "label": "Serif" },
+        { "value": "font-mono", "label": "Monospace" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "font_family_head",
+      "label": "Heading Font (Klasse)",
+      "default": "font-head",
+      "options": [
+        { "value": "font-head", "label": "Theme-Heading" },
+        { "value": "font-sans", "label": "Sans-Serif" },
+        { "value": "font-serif", "label": "Serif" }
+      ]
+    },
+    { "type": "range", "id": "fs_base", "label": "Body Schriftgröße (px)", "min": 14, "max": 20, "step": 1, "default": 16 },
+    { "type": "range", "id": "fs_h1", "label": "H1 Schriftgröße (px)", "min": 28, "max": 64, "step": 1, "default": 44 },
+    { "type": "range", "id": "fs_h2", "label": "H2 Schriftgröße (px)", "min": 22, "max": 48, "step": 1, "default": 28 },
+    { "type": "range", "id": "fs_h3", "label": "H3 Schriftgröße (px)", "min": 18, "max": 36, "step": 1, "default": 22 },
+    { "type": "color", "id": "color_body", "label": "Body Farbe", "default": "#0f172a" },
+    { "type": "color", "id": "color_head", "label": "Überschriften Farbe", "default": "#0f172a" }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab (Seite)",
+      "settings": [
+        { "type": "text", "id": "handle", "label": "Eindeutige Kennung (z. B. kuehlen)", "default": "kuehlen" },
+        { "type": "text", "id": "label", "label": "Label (Navigation)", "default": "Kühlen" },
+        { "type": "text", "id": "icon", "label": "Icon CSS-Klasse (optional, z. B. bi bi-snow2)", "default": "bi bi-snow2" },
+        { "type": "text", "id": "breadcrumb_parent", "label": "Breadcrumb Eltern (optional)", "default": "Anwendungen" },
+        { "type": "text", "id": "title", "label": "Seiten-Titel", "default": "Kühlen mit Trockeneis" },
+        { "type": "textarea", "id": "subtitle", "label": "Untertitel", "default": "Zuverlässige Tiefkühlung ohne Feuchtigkeit oder Rückstände." }
+      ]
+    },
+    {
+      "type": "tile",
+      "name": "Kachel",
+      "settings": [
+        { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+        { "type": "text", "id": "icon", "label": "Icon CSS-Klasse (z. B. bi bi-box-seam)", "default": "bi bi-box-seam" },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Versand & Spedition" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Bis zu 4 Tage Kühlzeit in isolierten Boxen. ADR UN 1845 (Klasse 9), lebensmittelecht.</p>" },
+        { "type": "textarea", "id": "checklist", "label": "Checkliste (eine Zeile pro Punkt)", "default": "Sichere Kühlkette ohne Schmelzwasser\nStyroporboxen bis 10 L" },
+        { "type": "header", "content": "Inline KPI (optional)" },
+        { "type": "checkbox", "id": "kpi_enable", "label": "KPI anzeigen", "default": false },
+        { "type": "text", "id": "kpi_icon", "label": "KPI Icon (z. B. bi bi-thermometer-snow)", "default": "bi bi-thermometer-snow" },
+        { "type": "text", "id": "kpi_title", "label": "KPI Titel", "default": "Lange Kühlung" },
+        { "type": "text", "id": "kpi_sub", "label": "KPI Unterzeile", "default": "ohne Stromanschluss" },
+        { "type": "header", "content": "Callout (optional)" },
+        { "type": "checkbox", "id": "callout_enable", "label": "Callout anzeigen", "default": false },
+        { "type": "text", "id": "callout_title", "label": "Callout Titel", "default": "Tipp:" },
+        { "type": "text", "id": "callout_text", "label": "Callout Text", "default": "Nach Erwärmung feste Verbindung." }
+      ]
+    },
+    {
+      "type": "kpi",
+      "name": "KPI (groß)",
+      "settings": [
+        { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+        { "type": "text", "id": "icon", "label": "Icon CSS-Klasse", "default": "bi bi-droplet" },
+        { "type": "text", "id": "title", "label": "Titel", "default": "0% Feuchtigkeit" },
+        { "type": "text", "id": "sub", "label": "Unterzeile", "default": "keine Nässe, keine Rückstände" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature-Liste",
+      "settings": [
+        { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+        { "type": "text", "id": "icon", "label": "Icon CSS-Klasse", "default": "bi bi-shield-check" },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Warum Trockeneis?" },
+        { "type": "textarea", "id": "items", "label": "Punkte (eine Zeile pro Punkt)", "default": "Rückstandsfrei (sublimiert)\nLebensmittelecht\nNicht abrasiv & ohne Chemie" }
+      ]
+    },
+    {
+      "type": "sidebar",
+      "name": "Sidebar / CTA",
+      "settings": [
+        { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+        { "type": "checkbox", "id": "show_sidebar", "label": "Sidebar anzeigen", "default": true },
+        { "type": "text", "id": "title", "label": "Titel", "default": "Sofort bestellen" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Frisch produziert, schnelle Lieferung." },
+        { "type": "text", "id": "btn1_label", "label": "Button 1 Label", "default": "Trockeneis kaufen" },
+        { "type": "url", "id": "btn1_link", "label": "Button 1 Link" },
+        { "type": "color", "id": "btn1_bg", "label": "Button 1 Hintergrund", "default": "#0ea5e9" },
+        { "type": "color", "id": "btn1_text", "label": "Button 1 Textfarbe", "default": "#ffffff" },
+        { "type": "text", "id": "btn2_label", "label": "Button 2 Label", "default": "Anfrage senden" },
+        { "type": "url", "id": "btn2_link", "label": "Button 2 Link" },
+        { "type": "color", "id": "btn2_outline", "label": "Button 2 Rahmen/Text", "default": "#0ea5e9" },
+        { "type": "color", "id": "btn2_text", "label": "Button 2 Textfarbe", "default": "#0ea5e9" },
+        { "type": "textarea", "id": "list", "label": "Stichpunkte (eine Zeile pro Punkt)", "default": "Boxen bis 10 L\nRegionale Lieferung 1–2 Werktage\nADR UN 1845" }
+      ]
+    }
+  ],
+  "max_blocks": 100,
+  "presets": [
+    {
+      "name": "Trockeneis – Detail-Tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "handle": "kuehlen", "label": "Kühlen", "icon": "bi bi-snow2", "breadcrumb_parent": "Anwendungen", "title": "Kühlen mit Trockeneis", "subtitle": "Lebensmittel, Pharma, Maschinen – zuverlässig und trocken." } },
+        { "type": "tile", "settings": { "tab_handle": "kuehlen", "icon": "bi bi-box-seam", "title": "Versand & Spedition", "text": "<p>Bis zu 4 Tage Kühlzeit. ADR UN 1845 (Klasse 9), lebensmittelecht.</p>", "checklist": "Sichere Kühlkette ohne Schmelzwasser\nStyroporboxen bis 10 L" } },
+        { "type": "kpi", "settings": { "tab_handle": "kuehlen", "icon": "bi bi-droplet", "title": "0% Feuchtigkeit", "sub": "keine Rückstände" } },
+        { "type": "feature", "settings": { "tab_handle": "kuehlen", "icon": "bi bi-shield-check", "title": "Warum Trockeneis?", "items": "Rückstandsfrei (sublimiert)\nLebensmittelecht\nNicht abrasiv & ohne Chemie" } },
+        { "type": "sidebar", "settings": { "tab_handle": "kuehlen", "show_sidebar": true, "title": "Sofort bestellen", "text": "Frisch produziert, schnelle Lieferung." } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
