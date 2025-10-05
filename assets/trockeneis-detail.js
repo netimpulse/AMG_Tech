@@ -52,11 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const pills = getPills();
 
     let target = tabs.find(t => t.dataset.route === h);
-    if (!target && tabs.length) target = tabs[0];
+    if (!target && tabs.length > 0) {
+        target = tabs[0];
+    }
 
     tabs.forEach(t => t.classList.toggle('is-active', t === target));
     pills.forEach(p => {
-      const isAct = p.dataset.tab === target?.dataset.route;
+      const isAct = target && p.dataset.tab === target.dataset.route;
       p.classList.toggle('is-active', isAct);
       p.setAttribute('aria-selected', isAct ? 'true' : 'false');
     });
@@ -64,11 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (target) {
         const newHash = `#${target.dataset.route}`;
         if (window.location.hash !== newHash) {
-            history.replaceState(null, '', newHash);
+            try {
+                history.replaceState(null, '', newHash);
+            } catch (e) {
+                // Security errors can happen in sandboxed iframes.
+                console.error("Could not update hash:", e);
+            }
         }
 
-        // scroll to top of section (but not in theme editor preview)
-        if (!(window.Shopify && window.Shopify.designMode)) {
+        const isThemeEditor = window.Shopify && window.Shopify.designMode;
+        if (!isThemeEditor) {
             const pillbar = root.querySelector('.te-pillbar');
             const offset = parseInt(root.dataset.stickyOffset || '0', 10);
             const y = root.getBoundingClientRect().top + window.scrollY - (pillbar?.offsetHeight || 0) - offset;
@@ -89,13 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init
   applyVars();
-
-  // On theme editor change, re-apply vars
-  if (window.Shopify && window.Shopify.designMode) {
+  
+  const isThemeEditor = window.Shopify && window.Shopify.designMode;
+  if (isThemeEditor) {
     document.addEventListener('shopify:section:load', applyVars);
     document.addEventListener('shopify:section:reorder', applyVars);
   }
 
-  // initial tab from hash or first
-  activate(location.hash || getPills()[0]?.getAttribute('href'));
+  // Initial tab activation from hash or simply the first available pill.
+  const pills = getPills();
+  const initialHandle = location.hash || (pills.length > 0 ? pills[0].getAttribute('href') : null);
+  activate(initialHandle);
 });
