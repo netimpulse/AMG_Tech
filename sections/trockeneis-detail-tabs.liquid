@@ -1,34 +1,121 @@
 {%- comment -%}
-  Section: Trockeneis Detail-Tabs
-  - Benötigt: assets/trockeneis-detail.css + assets/trockeneis-detail.js
+  ============================================================
+  Sektion: Trockeneis Detail-Tabs (All-in-One)
+  Version: Robust
+  - Beinhaltet Liquid, CSS und JS in einer einzigen Datei.
+  - Das JS ist speziell für die Neu-Lade-Events des
+    Shopify Theme Editors stabilisiert, um das "Verschwinden"
+    von Inhalten nach dem Hinzufügen von Blöcken zu verhindern.
+  ============================================================
 {%- endcomment -%}
 
-{{ 'trockeneis-detail.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'trockeneis-detail.js' | asset_url }}" defer="defer"></script>
+<style>
+  /* ===== Trockeneis Detail Tabs – CSS ===== */
+  #te-detail-{{ section.id }} .te-container { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  #te-detail-{{ section.id }} .te-section { padding: 48px 0; }
+  #te-detail-{{ section.id }} .te-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  #te-detail-{{ section.id }} .te-main { min-width: 0; }
+  #te-detail-{{ section.id }} .te-aside { min-width: 0; }
+
+  @media (min-width: 992px){
+    #te-detail-{{ section.id }} .te-grid { grid-template-columns: minmax(0, 1fr) 352px; gap: 32px; }
+  }
+
+  #te-detail-{{ section.id }} {
+    --fs-base: {{ section.settings.fs_base }}px;
+    --fs-h1: {{ section.settings.fs_h1 }}px;
+    --fs-h2: {{ section.settings.fs_h2 }}px;
+    --fs-h3: {{ section.settings.fs_h3 }}px;
+    --color-body: {{ section.settings.color_body }};
+    --color-head: {{ section.settings.color_head }};
+    --hero-start: {{ section.settings.hero_start }};
+    --hero-end: {{ section.settings.hero_end }};
+    --hero-text: {{ section.settings.hero_text }};
+    font-size: var(--fs-base);
+    color: var(--color-body);
+  }
+  #te-detail-{{ section.id }} .te-h1{ font-size: var(--fs-h1); font-weight: 900; color: var(--color-head); margin: 0 0 8px; }
+  #te-detail-{{ section.id }} .te-h5{ font-size: 20px; font-weight: 800; margin: 0 0 8px; }
+  #te-detail-{{ section.id }} .te-h6{ font-size: var(--fs-h3); font-weight: 800; margin: 0 0 8px; }
+  #te-detail-{{ section.id }} .te-lead{ color: var(--hero-text); opacity: .9; }
+
+  #te-detail-{{ section.id }} .te-pillbar { 
+    --pill-normal-bg: {{ section.settings.pill_bg }};
+    --pill-normal-text: {{ section.settings.pill_text }};
+    --pill-border-color: {{ section.settings.pill_border }};
+    --pill-hover-bg: {{ section.settings.pill_hover_bg }};
+    --pill-hover-text: {{ section.settings.pill_hover_text }};
+    --pill-active-bg: {{ section.settings.pill_active_bg }};
+    --pill-active-text: {{ section.settings.pill_active_text }};
+    position: relative; top: 0; z-index: 30; background: #ffffffcc; backdrop-filter: blur(8px); border-bottom: 1px solid rgba(2,6,23,.10); 
+  }
+  {% if section.settings.sticky %}
+  #te-detail-{{ section.id }} .te-pillbar { position: sticky; top: {{ section.settings.sticky_offset }}px; }
+  {% endif %}
+  #te-detail-{{ section.id }} .te-pillbar__wrap { display:flex; align-items:center; gap:16px; padding: 10px 0; }
+  #te-detail-{{ section.id }} .te-pillbar__title { font-weight: 700; white-space: nowrap; }
+  #te-detail-{{ section.id }} .te-pillbar__pills { display:flex; flex-wrap: wrap; gap: 8px; }
+
+  #te-detail-{{ section.id }} .te-pill {
+    display:inline-flex; align-items:center; gap:8px;
+    padding: 7px 14px; border-radius: 999px; text-decoration:none;
+    background: var(--pill-normal-bg); color: var(--pill-normal-text); border: 1px solid var(--pill-border-color);
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+    line-height: 1;
+  }
+  #te-detail-{{ section.id }} .te-pill:hover { 
+    background: var(--pill-hover-bg); color: var(--pill-hover-text); 
+    transform: translateY(-1px);
+  }
+  #te-detail-{{ section.id }} .te-pill.is-active { background: var(--pill-active-bg); color: var(--pill-active-text); border-color: var(--pill-active-bg); }
+
+  #te-detail-{{ section.id }} .te-hero-band {
+    background: linear-gradient(180deg, var(--hero-start) 0%, var(--hero-end) 100%);
+    color: var(--hero-text);
+    padding: 48px 0;
+  }
+  #te-detail-{{ section.id }} .te-breadcrumb.small { opacity:.9; margin: 0 0 8px; }
+  #te-detail-{{ section.id }} .te-breadcrumb a { color: inherit; text-decoration: none; opacity:.85; }
+  #te-detail-{{ section.id }} .te-breadcrumb a:hover { opacity: 1; text-decoration: underline; }
+
+  #te-detail-{{ section.id }} .te-tiles { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 720px){ #te-detail-{{ section.id }} .te-tiles { grid-template-columns: 1fr 1fr; } }
+  #te-detail-{{ section.id }} .te-tile { border:1px solid rgba(2,6,23,.10); border-radius: 16px; padding: 18px; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 16px 40px rgba(2,6,23,.06); }
+  #te-detail-{{ section.id }} .te-tile:hover { transform: translateY(-2px); transition: .25s ease; box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 22px 56px rgba(2,6,23,.1); }
+  #te-detail-{{ section.id }} .te-tile__title { display:flex; align-items:center; gap:10px; font-weight: 800; margin: 0 0 6px; }
+  #te-detail-{{ section.id }} .te-tile__text { color: var(--color-body); }
+  #te-detail-{{ section.id }} .te-checklist { list-style:none; padding:0; margin: 10px 0 0; display:grid; gap:6px; }
+  #te-detail-{{ section.id }} .te-checklist li { display:flex; gap:8px; align-items:flex-start; }
+  #te-detail-{{ section.id }} .te-icon-check { width: 18px; height: 18px; display:inline-block; border-radius:50%; background: #16a34a; position: relative; margin-top: 2px; flex-shrink: 0; }
+  #te-detail-{{ section.id }} .te-icon-check::after { content:''; position:absolute; inset: 4px 5px 4px 5px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform: rotate(45deg); }
+
+  #te-detail-{{ section.id }} .te-kpi { display:flex; align-items:center; gap:12px; padding: 10px 12px; border:1px solid rgba(2,6,23,.10); border-radius: 12px; background:#f8fafc; margin-top: 10px; }
+  #te-detail-{{ section.id }} .te-callout { margin-top: 10px; border-left: 4px solid var(--pill-active-bg); background: #effaff; border-radius: 6px; padding: 10px 12px; }
+
+  #te-detail-{{ section.id }} .te-feature { border:1px solid rgba(2,6,23,.10); border-radius: 16px; padding: 16px; background:#fff; margin-top: 16px; }
+  #te-detail-{{ section.id }} .te-feature--inline { padding: 8px 12px; }
+
+  #te-detail-{{ section.id }} .te-aside__card { border:1px solid rgba(2,6,23,.10); border-radius: 16px; background:#fff; padding: 16px; box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 16px 40px rgba(2,6,23,.06); position: sticky; top: {{ section.settings.sticky_offset | plus: 20 }}px; }
+  #te-detail-{{ section.id }} .te-aside__list { list-style:none; padding:0; margin: 10px 0 0; display:grid; gap:6px; }
+  #te-detail-{{ section.id }} .te-aside__list li { display: flex; gap: 8px; align-items: flex-start; }
+  #te-detail-{{ section.id }} .te-icon-bullet { width: 6px; height: 6px; border-radius: 999px; background: var(--pill-active-bg); display:inline-block; margin-top: 8px; flex-shrink: 0; }
+
+  #te-detail-{{ section.id }} .te-btn { display:inline-flex; align-items:center; justify-content:center; padding: 10px 14px; border-radius: 12px; text-decoration:none; font-weight: 700; margin-bottom: 10px; }
+  #te-detail-{{ section.id }} .te-btn--primary { background: var(--btn-bg, #0ea5e9); color: var(--btn-text, #fff); border: 1px solid var(--btn-bg, #0ea5e9); }
+  #te-detail-{{ section.id }} .te-btn--outline { background: transparent; color: var(--btn-text, var(--btn-outline, #0ea5e9)); border: 1px solid var(--btn-outline, #0ea5e9); }
+  #te-detail-{{ section.id }} .te-btn.w-100 { width: 100%; }
+  
+  #te-detail-{{ section.id }} .small { font-size: .925em; }
+  #te-detail-{{ section.id }} .te-muted { color: #475569; }
+
+  #te-detail-{{ section.id }} .route { display: none; }
+  #te-detail-{{ section.id }} .route.is-active { display: block; }
+</style>
 
 <section
   id="te-detail-{{ section.id }}"
   class="te-detail"
-  data-sticky="{{ section.settings.sticky }}"
-  data-sticky-offset="{{ section.settings.sticky_offset }}"
-  data-pill-normal-bg="{{ section.settings.pill_bg }}"
-  data-pill-normal-text="{{ section.settings.pill_text }}"
-  data-pill-border="{{ section.settings.pill_border }}"
-  data-pill-hover-bg="{{ section.settings.pill_hover_bg }}"
-  data-pill-hover-text="{{ section.settings.pill_hover_text }}"
-  data-pill-active-bg="{{ section.settings.pill_active_bg }}"
-  data-pill-active-text="{{ section.settings.pill_active_text }}"
-  data-hero-start="{{ section.settings.hero_start }}"
-  data-hero-end="{{ section.settings.hero_end }}"
-  data-hero-text="{{ section.settings.hero_text }}"
-  data-font-body="{{ section.settings.font_family_body }}"
-  data-font-head="{{ section.settings.font_family_head }}"
-  data-fs-base="{{ section.settings.fs_base }}"
-  data-fs-h1="{{ section.settings.fs_h1 }}"
-  data-fs-h2="{{ section.settings.fs_h2 }}"
-  data-fs-h3="{{ section.settings.fs_h3 }}"
-  data-color-body="{{ section.settings.color_body }}"
-  data-color-head="{{ section.settings.color_head }}"
+  data-section-id="{{ section.id }}"
 >
   {%- assign tabs = section.blocks | where: 'type', 'tab' -%}
 
@@ -61,7 +148,7 @@
   <!-- Tab-Panels -->
   {%- for t in tabs -%}
     {%- assign handle = t.settings.handle | handleize -%}
-    <div class="te-tab route route-detail" id="{{ handle }}" data-route="{{ handle }}" role="tabpanel" aria-labelledby="{{ handle }}-pill">
+    <div class="te-tab route route-detail" id="{{ handle }}" data-route="{{ handle }}" role="tabpanel">
       <!-- Hero -->
       <div class="te-hero-band">
         <div class="te-container">
@@ -80,115 +167,115 @@
 
       <div class="te-container te-section">
         <div class="te-grid">
-          <!-- Main -->
+          <!-- Main Content -->
           <div class="te-main">
             <div class="te-tiles">
               {%- for b in section.blocks -%}
                 {%- assign b_tab_handle = b.settings.tab_handle | handleize -%}
-                {%- if b.type == 'tile' and b.settings.tab_handle != blank and b_tab_handle == handle -%}
-                  <div class="te-tile">
-                    <h5 class="te-tile__title">
-                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
-                      {{ b.settings.title }}
-                    </h5>
-                    {%- if b.settings.text != blank -%}
-                      <div class="te-tile__text rte">{{ b.settings.text }}</div>
-                    {%- endif -%}
-                    {%- if b.settings.checklist != blank -%}
-                      <ul class="te-checklist">
-                        {%- assign items = b.settings.checklist | newline_to_br | split: '<br />' -%}
-                        {%- for i in items -%}
-                          {%- if i != blank -%}
-                            <li><i class="te-icon-check"></i><span>{{ i | strip }}</span></li>
-                          {%- endif -%}
-                        {%- endfor -%}
-                      </ul>
-                    {%- endif -%}
-                    {%- if b.settings.kpi_enable -%}
-                      <div class="te-kpi">
-                        {%- if b.settings.kpi_icon != blank -%}<i class="{{ b.settings.kpi_icon }}"></i>{%- endif -%}
-                        <div>
-                          <strong>{{ b.settings.kpi_title }}</strong>
-                          {%- if b.settings.kpi_sub != blank -%}
-                            <div class="small">{{ b.settings.kpi_sub }}</div>
-                          {%- endif -%}
-                        </div>
-                      </div>
-                    {%- endif -%}
-                    {%- if b.settings.callout_enable -%}
-                      <div class="te-callout">
-                        <strong>{{ b.settings.callout_title }}</strong>
-                        {%- if b.settings.callout_text != blank -%}
-                          <span> – {{ b.settings.callout_text }}</span>
+                {%- if b_tab_handle == handle -%}
+                  {%- case b.type -%}
+                    {%- when 'tile' -%}
+                      <div class="te-tile">
+                        <h5 class="te-tile__title">
+                          {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                          {{ b.settings.title }}
+                        </h5>
+                        {%- if b.settings.text != blank -%}
+                          <div class="te-tile__text rte">{{ b.settings.text }}</div>
+                        {%- endif -%}
+                        {%- if b.settings.checklist != blank -%}
+                          <ul class="te-checklist">
+                            {%- assign items = b.settings.checklist | newline_to_br | split: '<br />' -%}
+                            {%- for i in items -%}
+                              {%- if i != blank -%}
+                                <li><i class="te-icon-check"></i><span>{{ i | strip }}</span></li>
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                        {%- if b.settings.kpi_enable -%}
+                          <div class="te-kpi">
+                            {%- if b.settings.kpi_icon != blank -%}<i class="{{ b.settings.kpi_icon }}"></i>{%- endif -%}
+                            <div>
+                              <strong>{{ b.settings.kpi_title }}</strong>
+                              {%- if b.settings.kpi_sub != blank -%}
+                                <div class="small">{{ b.settings.kpi_sub }}</div>
+                              {%- endif -%}
+                            </div>
+                          </div>
+                        {%- endif -%}
+                        {%- if b.settings.callout_enable -%}
+                          <div class="te-callout">
+                            <strong>{{ b.settings.callout_title }}</strong>
+                            {%- if b.settings.callout_text != blank -%}
+                              <span> – {{ b.settings.callout_text }}</span>
+                            {%- endif -%}
+                          </div>
                         {%- endif -%}
                       </div>
-                    {%- endif -%}
-                  </div>
-                {%- endif -%}
-
-                {%- if b.type == 'kpi' and b_tab_handle == handle -%}
-                  <div class="te-feature te-feature--inline">
-                    <div class="te-kpi">
-                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
-                      <div>
-                        <strong>{{ b.settings.title }}</strong>
-                        {%- if b.settings.sub != blank -%}<div class="small">{{ b.settings.sub }}</div>{%- endif -%}
+                    {%- when 'kpi' -%}
+                      <div class="te-feature te-feature--inline">
+                        <div class="te-kpi">
+                          {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                          <div>
+                            <strong>{{ b.settings.title }}</strong>
+                            {%- if b.settings.sub != blank -%}<div class="small">{{ b.settings.sub }}</div>{%- endif -%}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                {%- endif -%}
-
-                {%- if b.type == 'feature' and b_tab_handle == handle -%}
-                  <div class="te-feature">
-                    <h6 class="te-h6">
-                      {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
-                      {{ b.settings.title }}
-                    </h6>
-                    {%- if b.settings.items != blank -%}
-                      <ul class="te-checklist">
-                        {%- assign lines = b.settings.items | newline_to_br | split: '<br />' -%}
-                        {%- for line in lines -%}
-                          {%- if line != blank -%}
-                            <li><i class="te-icon-check"></i><span>{{ line | strip }}</span></li>
-                          {%- endif -%}
-                        {%- endfor -%}
-                      </ul>
-                    {%- endif -%}
-                  </div>
+                    {%- when 'feature' -%}
+                      <div class="te-feature">
+                        <h6 class="te-h6">
+                          {%- if b.settings.icon != blank -%}<i class="{{ b.settings.icon }}"></i>{%- endif -%}
+                          {{ b.settings.title }}
+                        </h6>
+                        {%- if b.settings.items != blank -%}
+                          <ul class="te-checklist">
+                            {%- assign lines = b.settings.items | newline_to_br | split: '<br />' -%}
+                            {%- for line in lines -%}
+                              {%- if line != blank -%}
+                                <li><i class="te-icon-check"></i><span>{{ line | strip }}</span></li>
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </div>
+                  {%- endcase -%}
                 {%- endif -%}
               {%- endfor -%}
             </div>
           </div>
 
-          <!-- Aside (CTA pro Tab via Blocktype "sidebar") -->
+          <!-- Sidebar -->
           <aside class="te-aside">
-            {%- assign sidebars = section.blocks | where: 'type', 'sidebar' -%}
-            {%- for s in sidebars -%}
-              {%- assign s_tab_handle = s.settings.tab_handle | handleize -%}
-              {%- if s_tab_handle == handle and s.settings.show_sidebar -%}
-                <div class="te-aside__card">
-                  <h5 class="te-h5">{{ s.settings.title }}</h5>
-                  {%- if s.settings.text != blank -%}
-                    <p class="small te-muted">{{ s.settings.text }}</p>
-                  {%- endif -%}
-                  {%- if s.settings.btn1_label != blank -%}
-                    <a class="te-btn te-btn--primary w-100" href="{{ s.settings.btn1_link }}" style="--btn-bg: {{ s.settings.btn1_bg }}; --btn-text: {{ s.settings.btn1_text }};">{{ s.settings.btn1_label }}</a>
-                  {%- endif -%}
-                  {%- if s.settings.btn2_label != blank -%}
-                    <a class="te-btn te-btn--outline w-100" href="{{ s.settings.btn2_link }}" style="--btn-outline: {{ s.settings.btn2_outline }}; --btn-text: {{ s.settings.btn2_text }};">{{ s.settings.btn2_label }}</a>
-                  {%- endif -%}
-                  {%- if s.settings.list != blank -%}
-                    <hr>
-                    <ul class="te-aside__list small">
-                      {%- assign sitems = s.settings.list | newline_to_br | split: '<br />' -%}
-                      {%- for li in sitems -%}
-                        {%- if li != blank -%}
-                          <li><i class="te-icon-bullet"></i><span>{{ li | strip }}</span></li>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </ul>
-                  {%- endif -%}
-                </div>
+            {%- for s in section.blocks -%}
+              {%- if s.type == 'sidebar' -%}
+                {%- assign s_tab_handle = s.settings.tab_handle | handleize -%}
+                {%- if s_tab_handle == handle and s.settings.show_sidebar -%}
+                  <div class="te-aside__card">
+                    <h5 class="te-h5">{{ s.settings.title }}</h5>
+                    {%- if s.settings.text != blank -%}
+                      <p class="small te-muted">{{ s.settings.text }}</p>
+                    {%- endif -%}
+                    {%- if s.settings.btn1_label != blank -%}
+                      <a class="te-btn te-btn--primary w-100" href="{{ s.settings.btn1_link }}" style="--btn-bg: {{ s.settings.btn1_bg }}; --btn-text: {{ s.settings.btn1_text }};">{{ s.settings.btn1_label }}</a>
+                    {%- endif -%}
+                    {%- if s.settings.btn2_label != blank -%}
+                      <a class="te-btn te-btn--outline w-100" href="{{ s.settings.btn2_link }}" style="--btn-outline: {{ s.settings.btn2_outline }}; --btn-text: {{ s.settings.btn2_text }};">{{ s.settings.btn2_label }}</a>
+                    {%- endif -%}
+                    {%- if s.settings.list != blank -%}
+                      <hr>
+                      <ul class="te-aside__list small">
+                        {%- assign sitems = s.settings.list | newline_to_br | split: '<br />' -%}
+                        {%- for li in sitems -%}
+                          {%- if li != blank -%}
+                            <li><i class="te-icon-bullet"></i><span>{{ li | strip }}</span></li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
               {%- endif -%}
             {%- endfor -%}
           </aside>
@@ -197,6 +284,69 @@
     </div>
   {%- endfor -%}
 </section>
+
+<script>
+  window.TrockeneisTabs = window.TrockeneisTabs || {};
+
+  TrockeneisTabs.init = function(sectionEl) {
+    const pills = sectionEl.querySelectorAll('.te-pill');
+    const tabs = sectionEl.querySelectorAll('.te-tab');
+
+    if (!pills.length || !tabs.length) {
+      return;
+    }
+
+    const activateTab = (handle) => {
+      const cleanHandle = (handle || '').replace('#', '');
+      let targetTab = Array.from(tabs).find(t => t.dataset.route === cleanHandle);
+      
+      if (!targetTab) {
+        targetTab = tabs[0];
+      }
+
+      const activeHandle = targetTab.dataset.route;
+
+      tabs.forEach(t => t.classList.toggle('is-active', t.dataset.route === activeHandle));
+      pills.forEach(p => {
+        const isActive = p.dataset.tab === activeHandle;
+        p.classList.toggle('is-active', isActive);
+        p.setAttribute('aria-selected', isActive.toString());
+      });
+
+      if (window.location.hash !== `#${activeHandle}`) {
+        history.replaceState(null, '', `#${activeHandle}`);
+      }
+    };
+
+    sectionEl.addEventListener('click', (e) => {
+      const pill = e.target.closest('.te-pill');
+      if (pill) {
+        e.preventDefault();
+        activateTab(pill.getAttribute('href'));
+      }
+    });
+
+    // Initial activation
+    activateTab(window.location.hash || pills[0].getAttribute('href'));
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const sectionEl = document.querySelector('#te-detail-{{ section.id }}');
+    if (sectionEl) {
+      TrockeneisTabs.init(sectionEl);
+    }
+  });
+
+  if (typeof Shopify !== 'undefined' && Shopify.designMode) {
+    document.addEventListener('shopify:section:load', (event) => {
+      const sectionEl = event.target.querySelector('#te-detail-{{ section.id }}');
+      if (sectionEl) {
+        TrockeneisTabs.init(sectionEl);
+      }
+    });
+  }
+</script>
+
 
 {% schema %}
   {
@@ -221,29 +371,6 @@
       { "type": "color", "id": "hero_end", "label": "Hero Verlauf Ende", "default": "#0f172a" },
       { "type": "color", "id": "hero_text", "label": "Hero Text", "default": "#e6f6ff" },
       { "type": "header", "content": "Typografie" },
-      {
-        "type": "select",
-        "id": "font_family_body",
-        "label": "Body Font (Klasse)",
-        "default": "font-body",
-        "options": [
-          { "value": "font-body", "label": "Theme-Body" },
-          { "value": "font-sans", "label": "Sans-Serif" },
-          { "value": "font-serif", "label": "Serif" },
-          { "value": "font-mono", "label": "Monospace" }
-        ]
-      },
-      {
-        "type": "select",
-        "id": "font_family_head",
-        "label": "Heading Font (Klasse)",
-        "default": "font-head",
-        "options": [
-          { "value": "font-head", "label": "Theme-Heading" },
-          { "value": "font-sans", "label": "Sans-Serif" },
-          { "value": "font-serif", "label": "Serif" }
-        ]
-      },
       { "type": "range", "id": "fs_base", "label": "Body Schriftgröße (px)", "min": 14, "max": 20, "step": 1, "default": 16 },
       { "type": "range", "id": "fs_h1", "label": "H1 Schriftgröße (px)", "min": 28, "max": 64, "step": 1, "default": 44 },
       { "type": "range", "id": "fs_h2", "label": "H2 Schriftgröße (px)", "min": 22, "max": 48, "step": 1, "default": 28 },
@@ -256,7 +383,7 @@
         "type": "tab",
         "name": "Tab (Seite)",
         "settings": [
-          { "type": "text", "id": "handle", "label": "Eindeutige Kennung (z. B. kuehlen)", "default": "kuehlen" },
+          { "type": "text", "id": "handle", "label": "Eindeutige Kennung (z. B. kuehlen)", "info": "Diese Kennung verknüpft die Inhalte. Z.B. 'kuehlen'", "default": "kuehlen" },
           { "type": "text", "id": "label", "label": "Label (Navigation)", "default": "Kühlen" },
           { "type": "text", "id": "icon", "label": "Icon CSS-Klasse (optional, z. B. bi bi-snow2)", "default": "bi bi-snow2" },
           { "type": "text", "id": "breadcrumb_parent", "label": "Breadcrumb Eltern (optional)", "default": "Anwendungen" },
@@ -268,7 +395,7 @@
         "type": "tile",
         "name": "Kachel",
         "settings": [
-          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "info": "Gib hier die Kennung des Tabs ein, zu dem diese Kachel gehört (z.B. 'kuehlen').", "default": "kuehlen" },
           { "type": "text", "id": "icon", "label": "Icon CSS-Klasse (z. B. bi bi-box-seam)", "default": "bi bi-box-seam" },
           { "type": "text", "id": "title", "label": "Titel", "default": "Versand & Spedition" },
           { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Bis zu 4 Tage Kühlzeit in isolierten Boxen. ADR UN 1845 (Klasse 9), lebensmittelecht.</p>" },
@@ -288,7 +415,7 @@
         "type": "kpi",
         "name": "KPI (groß)",
         "settings": [
-          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "info": "Gib hier die Kennung des Tabs ein (z.B. 'kuehlen').", "default": "kuehlen" },
           { "type": "text", "id": "icon", "label": "Icon CSS-Klasse", "default": "bi bi-droplet" },
           { "type": "text", "id": "title", "label": "Titel", "default": "0% Feuchtigkeit" },
           { "type": "text", "id": "sub", "label": "Unterzeile", "default": "keine Nässe, keine Rückstände" }
@@ -298,7 +425,7 @@
         "type": "feature",
         "name": "Feature-Liste",
         "settings": [
-          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "info": "Gib hier die Kennung des Tabs ein (z.B. 'kuehlen').", "default": "kuehlen" },
           { "type": "text", "id": "icon", "label": "Icon CSS-Klasse", "default": "bi bi-shield-check" },
           { "type": "text", "id": "title", "label": "Titel", "default": "Warum Trockeneis?" },
           { "type": "textarea", "id": "items", "label": "Punkte (eine Zeile pro Punkt)", "default": "Rückstandsfrei (sublimiert)\nLebensmittelecht\nNicht abrasiv & ohne Chemie" }
@@ -308,7 +435,7 @@
         "type": "sidebar",
         "name": "Sidebar / CTA",
         "settings": [
-          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "default": "kuehlen" },
+          { "type": "text", "id": "tab_handle", "label": "Zugehörige Tab-Kennung", "info": "Gib hier die Kennung des Tabs ein (z.B. 'kuehlen').", "default": "kuehlen" },
           { "type": "checkbox", "id": "show_sidebar", "label": "Sidebar anzeigen", "default": true },
           { "type": "text", "id": "title", "label": "Titel", "default": "Sofort bestellen" },
           { "type": "textarea", "id": "text", "label": "Text", "default": "Frisch produziert, schnelle Lieferung." },
@@ -339,3 +466,4 @@
     ]
   }
 {% endschema %}
+
