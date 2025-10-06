@@ -14,10 +14,13 @@
   min-height:var(--header-min-height);
 }
 
-/* Logo + Zurück zusammen, ohne Transforms */
+/* Logo + Zurück zusammen */
 .custom-header__brand{
   display:flex; align-items:center;
   gap: var(--brand-gap, 16px);
+  /* NEU: Verschiebung per transform anwenden */
+  transform: translate(var(--logo-offset-x, 0), var(--logo-offset-y, 0));
+  transition: transform .3s ease;
 }
 
 .custom-header__logo{ display:flex; align-items:center; }
@@ -38,6 +41,16 @@
 }
 .custom-header__back:hover{ color:var(--back-hover-color); transform:translateY(-1px); }
 .custom-header__back-icon{ width:1em; height:1em; flex:0 0 auto; }
+
+/* NEU: Wrapper für alle rechten Elemente */
+.custom-header__right-side {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Gleicher Abstand wie vorher zwischen Navi und Button */
+  /* NEU: Verschiebung per transform anwenden */
+  transform: translate(var(--menu-offset-x, 0), var(--menu-offset-y, 0));
+  transition: transform .3s ease;
+}
 
 /* Navigation rechts */
 .custom-header__nav-wrapper{ display:flex; align-items:center; gap:1.5rem; }
@@ -79,6 +92,8 @@
 @media (max-width:990px){
   .custom-header__nav-wrapper{ display:none; }
   .custom-header__mobile-toggle{ display:flex; }
+  /* NEU: Gap für mobile Ansicht anpassen */
+  .custom-header__right-side { gap: 0.5rem; }
 }
 
 /* ===== Mobile Drawer (rechts) ===== */
