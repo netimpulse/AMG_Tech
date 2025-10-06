@@ -1,0 +1,187 @@
+{% comment %}
+  Custom Header Section
+  - Logo: Text oder Bild
+  - Menü: auswählbar
+  - Menü fett: ja/nein
+  - Farben: Hover / Aktiv
+  - X/Y-Verschiebung: Logo & Menü (in %)
+  - Icons: Warenkorb / Benutzerkonto optional
+{% endcomment %}
+
+{{ 'custom-header.css' | asset_url | stylesheet_tag }}
+
+<header
+  class="ch-header"
+  style="
+    --ch-hover: {{ section.settings.hover_color }};
+    --ch-active: {{ section.settings.active_color }};
+    --ch-logo-x: {{ section.settings.logo_offset_x | default: 0 }}%;
+    --ch-logo-y: {{ section.settings.logo_offset_y | default: 0 }}%;
+    --ch-menu-x: {{ section.settings.menu_offset_x | default: 0 }}%;
+    --ch-menu-y: {{ section.settings.menu_offset_y | default: 0 }}%;
+    --ch-menu-weight: {% if section.settings.menu_bold %}700{% else %}400{% endif %};
+  "
+  role="banner"
+>
+  <div class="ch-inner">
+    <!-- Logo -->
+    <div class="ch-logo-wrap" style="transform: translate(var(--ch-logo-x), var(--ch-logo-y));">
+      {% if section.settings.logo_type == 'text' %}
+        {% assign logo_text = section.settings.logo_text | default: shop.name %}
+        <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+          {{ logo_text }}
+        </a>
+      {% else %}
+        {% if section.settings.logo_image != blank %}
+          <a class="ch-logo ch-logo--image" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+            <img
+              src="{{ section.settings.logo_image | image_url: width: 300 }}"
+              srcset="{{ section.settings.logo_image | image_url: width: 150 }} 150w, {{ section.settings.logo_image | image_url: width: 300 }} 300w, {{ section.settings.logo_image | image_url: width: 600 }} 600w"
+              sizes="(max-width: 600px) 150px, 200px"
+              width="{{ section.settings.logo_image.width }}"
+              height="{{ section.settings.logo_image.height }}"
+              alt="{{ section.settings.logo_alt | escape }}"
+              loading="eager"
+            >
+          </a>
+        {% else %}
+          <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+            {{ shop.name }}
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- Navigation -->
+    <nav class="ch-nav" style="transform: translate(var(--ch-menu-x), var(--ch-menu-y));" aria-label="Hauptmenü">
+      {% if section.settings.main_menu != blank %}
+        <ul class="ch-menu" role="list">
+          {% for link in linklists[section.settings.main_menu].links %}
+            {% assign is_active = link.active %}
+            <li class="ch-menu__item">
+              <a
+                href="{{ link.url }}"
+                class="ch-menu__link {% if is_active %}is-active{% endif %}"
+                aria-current="{% if is_active %}page{% endif %}"
+              >
+                {{ link.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="ch-menu--placeholder">
+          <em>Bitte ein Menü in den Section-Einstellungen auswählen.</em>
+        </div>
+      {% endif %}
+    </nav>
+
+    <!-- Actions / Icons -->
+    <div class="ch-actions">
+      {% if section.settings.show_account_icon %}
+        <a class="ch-icon-link" href="{{ routes.account_url }}" aria-label="Benutzerkonto">
+          <span class="ch-icon" aria-hidden="true">
+            <!-- User Icon -->
+            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/>
+            </svg>
+          </span>
+        </a>
+      {% endif %}
+
+      {% if section.settings.show_cart_icon %}
+        <a class="ch-icon-link" href="{{ routes.cart_url }}" aria-label="Warenkorb">
+          <span class="ch-icon" aria-hidden="true">
+            <!-- Cart Icon -->
+            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+              <path d="M7 18a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm10 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zM7.16 14h9.45a2 2 0 0 0 1.92-1.47L20.88 6H6.21l-.94-3H2v2h2l3.6 10.59A2 2 0 0 0 9.5 17H19v-2H9.5z"/>
+            </svg>
+          </span>
+          {% if cart != empty and cart.item_count > 0 %}
+            <span class="ch-cart-count" aria-live="polite">{{ cart.item_count }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Custom Header",
+  "tag": "section",
+  "class": "section-custom-header",
+  "settings": [
+    { "type": "header", "content": "Logo" },
+    {
+      "type": "radio",
+      "id": "logo_type",
+      "label": "Logo-Typ",
+      "options": [
+        { "value": "text", "label": "Schriftzug" },
+        { "value": "image", "label": "Bild" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Schriftzug (falls 'Schriftzug' gewählt)",
+      "default": "Mein Shop"
+    },
+    { "type": "image_picker", "id": "logo_image", "label": "Logobild (falls 'Bild' gewählt)" },
+    { "type": "text", "id": "logo_alt", "label": "Alt-Text für Logobild", "default": "Shop-Logo" },
+
+    {
+      "type": "range",
+      "id": "logo_offset_x",
+      "label": "Logo X-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "logo_offset_y",
+      "label": "Logo Y-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "main_menu", "label": "Menü auswählen" },
+    { "type": "checkbox", "id": "menu_bold", "label": "Menü fett darstellen", "default": false },
+
+    {
+      "type": "range",
+      "id": "menu_offset_x",
+      "label": "Menü X-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "menu_offset_y",
+      "label": "Menü Y-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+
+    {
+      "type": "color",
+      "id": "hover_color",
+      "label": "Farbe beim Hover über Menüpunkt",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "active_color",
+      "label": "Farbe für aktiven Menüpunkt",
+      "default": "#000000"
+    },
+
+    { "type": "header", "content": "Icons" },
+    { "type": "checkbox", "id": "show_cart_icon", "label": "Warenkorb-Icon anzeigen", "default": true },
+    { "type": "checkbox", "id": "show_account_icon", "label": "Benutzerkonto-Icon anzeigen", "default": false }
+  ],
+  "blocks": [],
+  "presets": [
+    { "name": "Custom Header", "category": "Header" }
+  ]
+}
+{% endschema %}
