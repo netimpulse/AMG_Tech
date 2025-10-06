@@ -17,6 +17,6 @@
     }
   },
   "order": [
-    "custom-header"
+    "header"
   ],
 }
