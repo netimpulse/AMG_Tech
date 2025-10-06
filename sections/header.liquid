@@ -1,11 +1,12 @@
 {% comment %}
-  Custom Header Section
+  Custom Header Section (Dawn-kompatibel, ohne Extra-Script)
   - Logo: Text oder Bild
   - Menü: auswählbar
   - Menü fett: ja/nein
-  - Farben: Hover / Aktiv
+  - Hover-/Aktiv-Farbe
   - X/Y-Verschiebung: Logo & Menü (in %)
-  - Icons: Warenkorb / Benutzerkonto optional (nutzt vorhandene SVGs in /assets)
+  - Icons: Warenkorb / Benutzerkonto optional
+  - Cart-Drawer: nutzt Dawns Hook über #cart-icon-bubble
 {% endcomment %}
 
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
@@ -76,20 +77,35 @@
       {% endif %}
     </nav>
 
-    <!-- Actions / Icons (nutzt vorhandene SVGs in assets/) -->
+    <!-- Actions / Icons -->
     <div class="ch-actions">
       {% if section.settings.show_account_icon %}
-        <a class="ch-icon-link" href="{{ routes.account_url }}" aria-label="Benutzerkonto">
+        <a class="ch-icon-link"
+           href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+           aria-label="Benutzerkonto">
           <img class="ch-icon-img" src="{{ 'icon-account.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
         </a>
       {% endif %}
 
       {% if section.settings.show_cart_icon %}
-        <a class="ch-icon-link" href="{{ routes.cart_url }}" aria-label="Warenkorb">
+        {%- comment -%}
+          WICHTIG: Die ID 'cart-icon-bubble' aktiviert im Dawn-Theme das Öffnen
+          des Cart-Drawers. Fallback ist die /cart Seite via href.
+        {%- endcomment -%}
+        <a id="cart-icon-bubble"
+           class="ch-icon-link"
+           href="{{ routes.cart_url }}"
+           aria-label="{{ 'sections.header.cart' | t }}">
           <img class="ch-icon-img" src="{{ 'icon-cart.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
-          {% if cart != empty and cart.item_count > 0 %}
-            <span class="ch-cart-count" aria-live="polite">{{ cart.item_count }}</span>
-          {% endif %}
+
+          <span class="cart-count-bubble" aria-live="polite">
+            {%- if cart != empty and cart.item_count > 0 -%}
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+              <span class="visually-hidden">
+                {{ 'sections.header.cart_count' | t: count: cart.item_count }}
+              </span>
+            {%- endif -%}
+          </span>
         </a>
       {% endif %}
     </div>
@@ -113,57 +129,22 @@
       ],
       "default": "text"
     },
-    {
-      "type": "text",
-      "id": "logo_text",
-      "label": "Schriftzug (falls 'Schriftzug' gewählt)",
-      "default": "Mein Shop"
-    },
+    { "type": "text", "id": "logo_text", "label": "Schriftzug (falls 'Schriftzug' gewählt)", "default": "Mein Shop" },
     { "type": "image_picker", "id": "logo_image", "label": "Logobild (falls 'Bild' gewählt)" },
     { "type": "text", "id": "logo_alt", "label": "Alt-Text für Logobild", "default": "Shop-Logo" },
 
-    {
-      "type": "range",
-      "id": "logo_offset_x",
-      "label": "Logo X-Verschiebung (%)",
-      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
-    },
-    {
-      "type": "range",
-      "id": "logo_offset_y",
-      "label": "Logo Y-Verschiebung (%)",
-      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
-    },
+    { "type": "range", "id": "logo_offset_x", "label": "Logo X-Verschiebung (%)", "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "logo_offset_y", "label": "Logo Y-Verschiebung (%)", "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0 },
 
     { "type": "header", "content": "Navigation" },
     { "type": "link_list", "id": "main_menu", "label": "Menü auswählen" },
     { "type": "checkbox", "id": "menu_bold", "label": "Menü fett darstellen", "default": false },
 
-    {
-      "type": "range",
-      "id": "menu_offset_x",
-      "label": "Menü X-Verschiebung (%)",
-      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
-    },
-    {
-      "type": "range",
-      "id": "menu_offset_y",
-      "label": "Menü Y-Verschiebung (%)",
-      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
-    },
+    { "type": "range", "id": "menu_offset_x", "label": "Menü X-Verschiebung (%)", "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "menu_offset_y", "label": "Menü Y-Verschiebung (%)", "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0 },
 
-    {
-      "type": "color",
-      "id": "hover_color",
-      "label": "Farbe beim Hover über Menüpunkt",
-      "default": "#1a1a1a"
-    },
-    {
-      "type": "color",
-      "id": "active_color",
-      "label": "Farbe für aktiven Menüpunkt",
-      "default": "#000000"
-    },
+    { "type": "color", "id": "hover_color", "label": "Farbe beim Hover über Menüpunkt", "default": "#1a1a1a" },
+    { "type": "color", "id": "active_color", "label": "Farbe für aktiven Menüpunkt", "default": "#000000" },
 
     { "type": "header", "content": "Icons" },
     { "type": "checkbox", "id": "show_cart_icon", "label": "Warenkorb-Icon anzeigen", "default": true },
