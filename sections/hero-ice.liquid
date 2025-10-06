@@ -1,14 +1,12 @@
 {% comment %} 
   Section: Hero – Ice (strict JSON schema)
   - Hintergrundbild + Verlauf
-  - Medienbild rechts (Karte)
-  - Optionales Overlay-Bild mit X/Y/Width/Opacity
+  - Medienbild rechts (optional ein/aus)
+  - Overlay-Bild frei positionierbar (X/Y/Width/Opacity)
   - Badge (ein/aus)
   - 2 Buttons mit Normal/Hover-Farben
   - Voll editierbare Typografie via font_picker, Größen, Farben
-  Fixes:
-  - Ungültige JSON im schema behoben (HTML-Entities & ID-Konflikt)
-  - h1_font mit Default-Font-Stack
+  - Zentrier-Logik: Wenn Medienbild AUS und Ausrichtung = „Zentriert“, Content über volle Breite mittig.
 {% endcomment %}
 
 {{ 'hero-ice.css' | asset_url | stylesheet_tag }}
@@ -69,8 +67,12 @@
   </div>
 
   <div class="hero-ice__container page-width">
-    <div class="hero-ice__grid {% unless section.settings.show_media %}hero-ice__grid--no-media{% endunless %}">
-      <div class="hero-ice__content {% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}">
+    <div class="hero-ice__grid {% unless section.settings.show_media %}hero-ice__grid--no-media{% endunless %}"
+         {% unless section.settings.show_media %}style="display:block"{% endunless %}>
+      <div class="hero-ice__content {% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}"
+           {% if section.settings.align_desktop == 'center' and section.settings.show_media == false %}
+             style="max-width: var(--content-max); margin-inline: auto; text-align: center;"
+           {% endif %}>
         {% if section.settings.show_badge and section.settings.badge_text != blank %}
           <span class="hero-ice__badge" style="font-weight: {{ section.settings.badge_weight }};">
             {{ section.settings.badge_text }}
