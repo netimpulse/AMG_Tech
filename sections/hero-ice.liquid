@@ -7,6 +7,7 @@
   - 2 Buttons mit Normal/Hover-Farben
   - Voll editierbare Typografie via font_picker, Größen, Farben
   - Zentrier-Logik: Wenn Medienbild AUS und Ausrichtung = „Zentriert“, Content über volle Breite mittig.
+  - Buttons: immer mittig relativ zum Text (hero-ice__actions → flex-center)
 {% endcomment %}
 
 {{ 'hero-ice.css' | asset_url | stylesheet_tag }}
@@ -96,7 +97,12 @@
           </p>
         {% endif %}
 
-        <div class="hero-ice__actions">
+        {%- comment -%}
+          NEU: Buttons immer mittig relativ zum Text.
+          Inline-Styles (display:flex; justify-content:center) überstimmen evtl. Theme-Styles.
+        {%- endcomment -%}
+        <div class="hero-ice__actions"
+             style="display:flex; flex-wrap:wrap; gap:.75rem; justify-content:center; text-align:center;">
           {% if section.settings.btn1_label != blank %}
             <a class="hero-ice__btn hero-ice__btn--primary"
                href="{{ section.settings.btn1_url }}"
