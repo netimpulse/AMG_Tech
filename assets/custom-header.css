@@ -78,7 +78,7 @@
   background: var(--ch-active);
 }
 
-/* Icons */
+/* Icons (Assets) */
 .ch-icon-link {
   display: inline-flex;
   align-items: center;
@@ -86,8 +86,9 @@
   text-decoration: none;
   color: inherit;
 }
-.ch-icon svg { display: block; }
+.ch-icon-img { display: block; width: 22px; height: 22px; }
 
+/* Cart count badge */
 .ch-cart-count {
   position: absolute;
   top: -6px;
