@@ -1,8 +1,8 @@
-/* Custom Header – Styles */
+/* Custom Header – Styles (Dawn-kompatibel) */
 
 .ch-header {
   position: relative;
-  z-index: 20;
+  z-index: 50; /* über Content, aber unter Modals/Drawers des Themes */
   width: 100%;
   background: var(--color-background, #fff);
   border-bottom: 1px solid rgba(0,0,0,.06);
@@ -88,8 +88,8 @@
 }
 .ch-icon-img { display: block; width: 22px; height: 22px; }
 
-/* Cart count badge */
-.ch-cart-count {
+/* Dawn-kompatible Cart-Badge */
+.cart-count-bubble {
   position: absolute;
   top: -6px;
   right: -8px;
@@ -116,4 +116,14 @@
   .ch-nav { grid-area: nav; margin-top: 8px; }
   .ch-actions { grid-area: actions; }
   .ch-menu { flex-wrap: wrap; gap: 14px; }
+}
+
+/* Accessibility helper in Dawn */
+.visually-hidden {
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0) !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
 }
