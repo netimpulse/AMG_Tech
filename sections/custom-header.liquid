@@ -1,137 +1,12 @@
-{% comment %}
-====================================================================================
-  1. CSS-STILE
-====================================================================================
-{% endcomment %}
+{% comment %} Lädt deine externe CSS-Datei aus dem 'assets' Ordner {% endcomment %}
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
 
+{% comment %}
+  Diese Style-Sektion MUSS hier in der .liquid Datei bleiben.
+  Sie nimmt die Werte aus den Theme-Einstellungen (z.B. Farben, Schriftgrößen)
+  und macht sie als CSS-Variablen für deine externe CSS-Datei verfügbar.
+{% endcomment %}
 <style>
-  /* KORRIGIERT: Erzwingt, dass der Header die volle Bildschirmbreite einnimmt,
-     unabhängig von übergeordneten Containern. */
-  .custom-header-section{
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100vw;
-    z-index: 1000;
-    background: var(--header-bg-color);
-    box-shadow: 0 1px 3px rgba(0,0,0,.1);
-  }
-
-  /* KORRIGIERT: Stellt sicher, dass der Inhalt innerhalb des Headers
-     wieder eine maximale Breite hat und zentriert ist. */
-  .custom-header__container{
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    padding: var(--padding-vertical) var(--padding-horizontal);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: var(--header-min-height);
-  }
-
-  /* Logo + Zurück zusammen */
-  .custom-header__brand{
-    display:flex; align-items:center;
-    gap: var(--brand-gap, 16px);
-    transform: translate(var(--logo-offset-x, 0), var(--logo-offset-y, 0));
-    transition: transform .3s ease;
-  }
-
-  .custom-header__logo{ display:flex; align-items:center; }
-  .custom-header__logo-img{ height:var(--logo-height); width:auto; display:block; }
-  .custom-header__logo-text{ font-weight:700; text-decoration:none; line-height:1; }
-
-  /* Zurück-Pfeil inline */
-  .custom-header__back{
-    display:inline-flex; align-items:center; gap:.5rem;
-    text-decoration:none; line-height:1;
-    color:var(--back-text-color);
-    font-size:var(--back-font-size);
-    font-family:var(--back-font-family);
-    font-style:var(--back-font-style);
-    font-weight:var(--back-font-weight);
-    transition:color .3s ease, transform .2s ease;
-    white-space:nowrap;
-  }
-  .custom-header__back:hover{ color:var(--back-hover-color); transform:translateY(-1px); }
-  .custom-header__back-icon{ width:1em; height:1em; flex:0 0 auto; }
-
-  /* Wrapper für alle rechten Elemente */
-  .custom-header__right-side {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    transform: translate(var(--menu-offset-x, 0), var(--menu-offset-y, 0));
-    transition: transform .3s ease;
-  }
-
-  /* Navigation rechts */
-  .custom-header__nav-wrapper{ display:flex; align-items:center; gap:1.5rem; }
-  .custom-header__nav{ display:flex; gap:2rem; align-items:center; }
-
-  .custom-header__nav-link{
-    text-decoration:none; color:var(--nav-text-color);
-    font-size:var(--nav-font-size); position:relative; padding-bottom:5px;
-    transition:color .3s ease;
-    font-family:var(--nav-font-family);
-    font-style:var(--nav-font-style);
-    font-weight:var(--nav-font-weight);
-  }
-  .custom-header__nav-link:hover{ color:var(--nav-hover-color); }
-  .custom-header__nav-link::after{
-    content:''; position:absolute; bottom:0; left:0; width:0; height:2px;
-    background:var(--nav-hover-color); transition:width .3s ease;
-  }
-  .custom-header__nav-link:hover::after,
-  .custom-header__nav-link.active::after{ width:100%; }
-  .custom-header__nav-link.active{ color:var(--nav-hover-color); }
-
-  .custom-header__contact-btn{
-    display:inline-block; padding:.6rem 1.6rem; border-radius:12px;
-    text-decoration:none; font-weight:500;
-    color:var(--btn-text-color); background:var(--btn-bg-color);
-    border:1px solid transparent;
-    transition:background .3s ease, color .3s ease, box-shadow .3s ease, transform .2s ease;
-  }
-  .custom-header__contact-btn:hover{
-    color:var(--btn-hover-text-color); background:var(--btn-hover-bg-color);
-    transform:translateY(-2px); box-shadow:0 4px 14px rgba(0,0,0,.12);
-  }
-
-  .custom-header__mobile-toggle{ display:none; flex-direction:column; gap:4px; background:none; border:none; cursor:pointer; padding:8px; }
-  .custom-header__mobile-toggle span{ width:24px; height:2px; background:var(--nav-text-color); transition:all .3s ease; }
-
-  /* Responsive */
-  @media (max-width:990px){
-    .custom-header__nav-wrapper{ display:none; }
-    .custom-header__mobile-toggle{ display:flex; }
-    .custom-header__right-side { gap: 0.5rem; }
-  }
-
-  /* Mobile Drawer (rechts) */
-  html.no-scroll{ overflow:hidden; }
-  .custom-header-section .custom-header__overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:1000; }
-  .custom-header-section.is-drawer-open .custom-header__overlay{ opacity:1; pointer-events:auto; }
-  .custom-header__drawer{ position:fixed; top:0; right:0; height:100vh; width:min(86vw, 380px); background:var(--header-bg-color); box-shadow:-8px 0 24px rgba(0,0,0,.12); transform:translate3d(105%,0,0); transition:transform .3s ease, visibility .3s ease; z-index:1001; display:flex; flex-direction:column; padding:24px 24px 0; overflow:hidden; visibility:hidden; pointer-events:none; }
-  .custom-header-section.is-drawer-open .custom-header__drawer{ transform:translate3d(0,0,0); visibility:visible; pointer-events:auto; }
-  .custom-header__drawer-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-  .custom-header__drawer-title{ font-weight:700; font-size:18px; margin:0; }
-  .custom-header__drawer-close{ background:none; border:none; cursor:pointer; padding:8px; line-height:0; }
-  .custom-header__drawer-nav{ flex:1 1 auto; display:flex; flex-direction:column; gap:8px; padding:12px 0 24px; overflow:auto; -webkit-overflow-scrolling:touch; }
-  .custom-header__drawer-link{ text-decoration:none; color:var(--nav-text-color); font-family:var(--nav-font-family); font-style:var(--nav-font-style); font-weight:var(--nav-font-weight); font-size:18px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,.06); transition:color .3s ease; }
-  .custom-header__drawer-link:hover, .custom-header__drawer-link.active { color:var(--nav-hover-color); }
-  .custom-header__drawer-cta{ position:sticky; bottom:0; background:var(--header-bg-color); padding:12px 0 calc(12px + env(safe-area-inset-bottom, 0)); border-top:1px solid rgba(0,0,0,.06); box-shadow:0 -4px 10px rgba(0,0,0,.04); }
-  .custom-header__drawer-cta .custom-header__contact-btn{ width:100%; text-align:center; }
-  .custom-header-section.is-drawer-open .custom-header__mobile-toggle span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
-  .custom-header-section.is-drawer-open .custom-header__mobile-toggle span:nth-child(2){ opacity:0; }
-  .custom-header-section.is-drawer-open .custom-header__mobile-toggle span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
-  .custom-header__mobile-toggle span{ transform-origin:center; }
-  @media (min-width:991px){ .custom-header__overlay, .custom-header__drawer{ display:none !important; } }
-
-  /* CSS-Variablen aus dem Schema */
   .custom-header-section-{{ section.id }}{
     --header-bg-color: {{ section.settings.background_color }};
     --padding-vertical: {{ section.settings.padding_vertical }}px;
@@ -160,19 +35,8 @@
     --back-hover-color: {{ section.settings.back_hover_color }};
     --back-font-size: {{ section.settings.back_font_size }}px;
   }
-
-  /* Statische Hilfs-Stile */
-  #sticky-header-{{ section.id }}{ top:0; z-index:1000; width:100%; }
-  @media (min-width: 991px){ .custom-header__cta-mobile{ display:none !important; } }
-  @media (max-width: 990px){ .custom-header__cta-mobile{ display:flex; } }
 </style>
 
-
-{% comment %}
-====================================================================================
-  2. HTML-STRUKTUR
-====================================================================================
-{% endcomment %}
 <header id="sticky-header-{{ section.id }}" class="custom-header-section custom-header-section-{{ section.id }}">
   <div class="custom-header__container">
 
@@ -256,11 +120,6 @@
 </header>
 
 
-{% comment %}
-====================================================================================
-  3. JAVASCRIPT
-====================================================================================
-{% endcomment %}
 <script>
   (function(){
     const header = document.getElementById('sticky-header-{{ section.id }}');
@@ -316,11 +175,6 @@
 </script>
 
 
-{% comment %}
-====================================================================================
-  4. SCHEMA
-====================================================================================
-{% endcomment %}
 {% schema %}
 {
   "name": "Sticky Header (Custom)",
