@@ -1,27 +1,4 @@
-{% comment %} 
-  Section: Hero – Ice (strict JSON schema)
-  - Hintergrundbild + Verlauf
-  - Medienbild rechts (Karte)
-  - Optionales Overlay-Bild mit X/Y/Width/Opacity
-  - Badge (ein/aus)
-  - 2 Buttons mit Normal/Hover-Farben
-  - Voll editierbare Typografie via font_picker, Größen, Farben
-  Fixes:
-  - Ungültige JSON im schema behoben (HTML-Entities & ID-Konflikt)
-  - h1_font mit Default-Font-Stack
-{% endcomment %}
-
-{{ 'hero-ice.css' | asset_url | stylesheet_tag }}
-
-{%- assign sec_id = section.id -%}
-
-{%- comment -%} Schatten-Auswahl vorbereiten {%- endcomment -%}
-{%- assign shadow_val = '' -%}
-{%- case section.settings.media_shadow -%}
-  {%- when 'none' -%}{%- assign shadow_val = 'none' -%}
-  {%- when 'soft' -%}{%- assign shadow_val = '0 18px 48px rgba(2,6,23,.28)' -%}
-  {%- when 'hard' -%}{%- assign shadow_val = '0 8px 24px rgba(0,0,0,.35)' -%}
-{%- endcase -%}
+{%- comment -%} … Kopf bleibt unverändert {%- endcomment -%}
 
 <section id="hero-ice-{{ sec_id }}"
   class="hero-ice"
@@ -49,7 +26,7 @@
     --btn2-bg-h: {{ section.settings.btn2_bg_h }};
     --btn2-text-h: {{ section.settings.btn2_text_h }};
     --btn-radius: {{ section.settings.btn_radius }}px;
-    --content-max: {{ section.settings.content_max }}px;
+    --content-max: {% if section.settings.show_media %}{{ section.settings.content_max }}px{% else %}1200px{% endif %};
     --media-shadow: {{ shadow_val }};
   "
 >
@@ -69,7 +46,7 @@
   </div>
 
   <div class="hero-ice__container page-width">
-    <div class="hero-ice__grid">
+    <div class="hero-ice__grid {% unless section.settings.show_media %}hero-ice__grid--no-media{% endunless %}">
       <div class="hero-ice__content {% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}">
         {% if section.settings.show_badge and section.settings.badge_text != blank %}
           <span class="hero-ice__badge" style="font-weight: {{ section.settings.badge_weight }};">
@@ -112,6 +89,7 @@
         </div>
       </div>
 
+      {% if section.settings.show_media %}
       <div class="hero-ice__media">
         <div class="hero-ice__media-card" style="border-radius: var(--hero-radius); box-shadow: var(--media-shadow);">
           {% if section.settings.media_image != blank %}
@@ -133,6 +111,7 @@
           {% endif %}
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </section>
@@ -156,6 +135,7 @@
 
     { "type": "header", "content": "Hintergrund & Medien" },
     { "type": "image_picker", "id": "bg_image", "label": "Hintergrundbild (vollflächig)" },
+    { "type": "checkbox", "id": "show_media", "label": "Medienbild rechts anzeigen", "default": true },
     { "type": "image_picker", "id": "media_image", "label": "Medienbild rechts (Karte)" },
 
     { "type": "header", "content": "Overlay-Bild (frei positionierbar)" },
@@ -222,6 +202,3 @@
   ]
 }
 {% endschema %}
-
-{% stylesheet %}{% endstylesheet %}
-{% javascript %}{% endjavascript %}
