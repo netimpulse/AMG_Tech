@@ -12,9 +12,62 @@
     "main": {
       "type": "hello-world",
       "settings": {}
+    },
+    "hero_ice_kgn78r": {
+      "type": "hero-ice",
+      "name": "Hero – Ice",
+      "settings": {
+        "pad_y": 96,
+        "radius": 16,
+        "grad_start": "#0b1220",
+        "grad_end": "#0f172a",
+        "overlay_gradient": true,
+        "overlay_color": "#000000",
+        "tint_opacity": 0,
+        "color_text": "#e6f6ff",
+        "show_media": false,
+        "ov_x": 70,
+        "ov_y": 30,
+        "ov_w": 70,
+        "ov_opacity": 100,
+        "badge_text": "Frisches Trockeneis aus der Region",
+        "show_badge": true,
+        "badge_bg": "#d7f2f9",
+        "badge_text_color": "#0b5e6f",
+        "badge_weight": 700,
+        "heading": "Kühlen, Reinigen, Strahlen —",
+        "heading_accent": "mit Trockeneis",
+        "h1_color": "#ffffff",
+        "h1_accent_color": "#00b4e6",
+        "h1_font": "system_ui_n4",
+        "h1_size": 56,
+        "h1_weight": 900,
+        "lead": "<p>Lebensmittelechte Pellets, schnelle Lieferung und professionelle Beratung. Anwendungen von Versand & Kühlung bis zur industriellen Reinigung ohne Chemie.</p>",
+        "lead_font": "system_ui_n4",
+        "lead_color": "#bfe7ff",
+        "lead_size": 18,
+        "lead_weight": 400,
+        "content_max": 720,
+        "btn1_label": "Jetzt Trockeneis kaufen",
+        "btn1_url": "",
+        "btn1_bg": "#0ea5e9",
+        "btn1_text": "#ffffff",
+        "btn1_bg_h": "#0284c7",
+        "btn1_text_h": "#ffffff",
+        "btn2_label": "Strahlservice entdecken",
+        "btn2_url": "",
+        "btn2_bd": "#0ea5e9",
+        "btn2_text": "#0ea5e9",
+        "btn2_bg_h": "#0ea5e9",
+        "btn2_text_h": "#ffffff",
+        "btn_radius": 12,
+        "align_desktop": "center",
+        "media_shadow": "soft"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "hero_ice_kgn78r"
   ]
 }
