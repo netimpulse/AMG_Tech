@@ -5,7 +5,7 @@
   - Menü fett: ja/nein
   - Farben: Hover / Aktiv
   - X/Y-Verschiebung: Logo & Menü (in %)
-  - Icons: Warenkorb / Benutzerkonto optional
+  - Icons: Warenkorb / Benutzerkonto optional (nutzt vorhandene SVGs in /assets)
 {% endcomment %}
 
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
@@ -76,27 +76,17 @@
       {% endif %}
     </nav>
 
-    <!-- Actions / Icons -->
+    <!-- Actions / Icons (nutzt vorhandene SVGs in assets/) -->
     <div class="ch-actions">
       {% if section.settings.show_account_icon %}
         <a class="ch-icon-link" href="{{ routes.account_url }}" aria-label="Benutzerkonto">
-          <span class="ch-icon" aria-hidden="true">
-            <!-- User Icon -->
-            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
-              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/>
-            </svg>
-          </span>
+          <img class="ch-icon-img" src="{{ 'icon-account.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
         </a>
       {% endif %}
 
       {% if section.settings.show_cart_icon %}
         <a class="ch-icon-link" href="{{ routes.cart_url }}" aria-label="Warenkorb">
-          <span class="ch-icon" aria-hidden="true">
-            <!-- Cart Icon -->
-            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
-              <path d="M7 18a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm10 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zM7.16 14h9.45a2 2 0 0 0 1.92-1.47L20.88 6H6.21l-.94-3H2v2h2l3.6 10.59A2 2 0 0 0 9.5 17H19v-2H9.5z"/>
-            </svg>
-          </span>
+          <img class="ch-icon-img" src="{{ 'icon-cart.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
           {% if cart != empty and cart.item_count > 0 %}
             <span class="ch-cart-count" aria-live="polite">{{ cart.item_count }}</span>
           {% endif %}
@@ -185,4 +175,3 @@
   ]
 }
 {% endschema %}
-
