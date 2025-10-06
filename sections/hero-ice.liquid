@@ -1,20 +1,17 @@
 {% comment %} 
-  Section: Hero – Ice (strict JSON schema)
-  - Hintergrundbild + Verlauf
-  - Medienbild rechts (optional ein/aus)
-  - Overlay-Bild frei positionierbar (X/Y/Width/Opacity)
-  - Badge (ein/aus)
-  - 2 Buttons mit Normal/Hover-Farben
-  - Voll editierbare Typografie via font_picker, Größen, Farben
-  - Zentrier-Logik: Wenn Medienbild AUS und Ausrichtung = „Zentriert“, Content über volle Breite mittig.
-  - Buttons: immer mittig relativ zum Text (hero-ice__actions → flex-center)
+  Section: Hero – Ice (Overlay-only)
+  Änderungen:
+  - Medienbild entfernt (keine media_image/show_media Settings mehr)
+  - Wenn overlay_image vorhanden ⇒ 2-Spalten, Inhalt links
+  - Wenn kein overlay_image und Ausrichtung = center ⇒ Inhalt volle Breite zentriert
+  - Buttons mit mehr Abstand zum Text
 {% endcomment %}
 
 {{ 'hero-ice.css' | asset_url | stylesheet_tag }}
 
 {%- assign sec_id = section.id -%}
+{%- assign has_overlay = section.settings.overlay_image != blank -%}
 
-{%- comment -%} Schatten-Auswahl vorbereiten {%- endcomment -%}
 {%- assign shadow_val = '' -%}
 {%- case section.settings.media_shadow -%}
   {%- when 'none' -%}{%- assign shadow_val = 'none' -%}
@@ -48,7 +45,7 @@
     --btn2-bg-h: {{ section.settings.btn2_bg_h }};
     --btn2-text-h: {{ section.settings.btn2_text_h }};
     --btn-radius: {{ section.settings.btn_radius }}px;
-    --content-max: {% if section.settings.show_media %}{{ section.settings.content_max }}px{% else %}1200px{% endif %};
+    --content-max: {% if has_overlay %}{{ section.settings.content_max }}px{% else %}1200px{% endif %};
     --media-shadow: {{ shadow_val }};
   "
 >
@@ -68,12 +65,13 @@
   </div>
 
   <div class="hero-ice__container page-width">
-    <div class="hero-ice__grid {% unless section.settings.show_media %}hero-ice__grid--no-media{% endunless %}"
-         {% unless section.settings.show_media %}style="display:block"{% endunless %}>
-      <div class="hero-ice__content {% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}"
-           {% if section.settings.align_desktop == 'center' and section.settings.show_media == false %}
-             style="max-width: var(--content-max); margin-inline: auto; text-align: center;"
-           {% endif %}>
+    <div class="hero-ice__grid{% unless has_overlay %} hero-ice__grid--no-media{% endunless %}"{% unless has_overlay %} style="display:block"{% endunless %}>
+      <div class="hero-ice__content {% if has_overlay %}is-left{% else %}{% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}{% endif %}"
+           {% unless has_overlay %}
+             {% if section.settings.align_desktop == 'center' %}
+               style="max-width: var(--content-max); margin-inline: auto; text-align: center;"
+             {% endif %}
+           {% endunless %}>
         {% if section.settings.show_badge and section.settings.badge_text != blank %}
           <span class="hero-ice__badge" style="font-weight: {{ section.settings.badge_weight }};">
             {{ section.settings.badge_text }}
@@ -97,12 +95,9 @@
           </p>
         {% endif %}
 
-        {%- comment -%}
-          NEU: Buttons immer mittig relativ zum Text.
-          Inline-Styles (display:flex; justify-content:center) überstimmen evtl. Theme-Styles.
-        {%- endcomment -%}
+        <!-- Buttons immer mittig relativ zum Text + zusätzlicher Abstand nach oben -->
         <div class="hero-ice__actions"
-             style="display:flex; flex-wrap:wrap; gap:.75rem; justify-content:center; text-align:center;">
+             style="display:flex; flex-wrap:wrap; gap:.75rem; justify-content:center; text-align:center; margin-top:16px;">
           {% if section.settings.btn1_label != blank %}
             <a class="hero-ice__btn hero-ice__btn--primary"
                href="{{ section.settings.btn1_url }}"
@@ -120,26 +115,21 @@
         </div>
       </div>
 
-      {% if section.settings.show_media %}
+      {% if has_overlay %}
       <div class="hero-ice__media">
-        <div class="hero-ice__media-card" style="border-radius: var(--hero-radius); box-shadow: var(--media-shadow);">
-          {% if section.settings.media_image != blank %}
-            {%- render 'image', image: section.settings.media_image, widths: '720,960,1200', sizes: '(min-width: 992px) 50vw, 100vw', alt: section.settings.media_image.alt | default: 'Hero media' -%}
-          {% else %}
-            <div class="hero-ice__placeholder"></div>
-          {% endif %}
-
-          {% if section.settings.overlay_image != blank %}
-            <div class="hero-ice__overlay-img"
-                 style="
-                   --ov-x: {{ section.settings.ov_x }}%;
-                   --ov-y: {{ section.settings.ov_y }}%;
-                   --ov-w: {{ section.settings.ov_w }}%;
-                   --ov-opacity: {{ section.settings.ov_opacity }}%;
-                 ">
-              {%- render 'image', image: section.settings.overlay_image, widths: '360,600,900', sizes: '40vw', alt: section.settings.overlay_image.alt | default: 'Overlay' -%}
-            </div>
-          {% endif %}
+        <div class="hero-ice__media-card" style="border-radius: var(--hero-radius); box-shadow: var(--media-shadow); position: relative; overflow: hidden;">
+          <!-- Nur das frei positionierbare Overlay-Bild -->
+          <div class="hero-ice__overlay-img"
+               style="
+                 --ov-x: {{ section.settings.ov_x }}%;
+                 --ov-y: {{ section.settings.ov_y }}%;
+                 --ov-w: {{ section.settings.ov_w }}%;
+                 --ov-opacity: {{ section.settings.ov_opacity }}%;
+               ">
+            {%- render 'image', image: section.settings.overlay_image, widths: '360,600,900', sizes: '40vw', alt: section.settings.overlay_image.alt | default: 'Overlay' -%}
+          </div>
+          <!-- Leichte Hintergrundfläche für Tiefe (keine echte Mediengrafik) -->
+          <div aria-hidden="true" style="position:absolute; inset:0; background: radial-gradient(60% 50% at 50% 50%, rgba(255,255,255,.06), rgba(2,6,23,.08) 60%, rgba(2,6,23,.12));"></div>
         </div>
       </div>
       {% endif %}
@@ -164,10 +154,8 @@
 
     { "type": "color", "id": "color_text", "label": "Allgemeine Textfarbe", "default": "#e6f6ff" },
 
-    { "type": "header", "content": "Hintergrund & Medien" },
+    { "type": "header", "content": "Hintergrund" },
     { "type": "image_picker", "id": "bg_image", "label": "Hintergrundbild (vollflächig)" },
-    { "type": "checkbox", "id": "show_media", "label": "Medienbild rechts anzeigen", "default": true },
-    { "type": "image_picker", "id": "media_image", "label": "Medienbild rechts (Karte)" },
 
     { "type": "header", "content": "Overlay-Bild (frei positionierbar)" },
     { "type": "image_picker", "id": "overlay_image", "label": "Overlay-Grafik" },
@@ -220,7 +208,7 @@
       { "value": "left", "label": "Links" },
       { "value": "center", "label": "Zentriert" }
     ]},
-    { "type": "select", "id": "media_shadow", "label": "Schatten Medienkarte", "default": "soft",
+    { "type": "select", "id": "media_shadow", "label": "Schatten Overlay-Karte", "default": "soft",
       "options": [
         { "value": "none", "label": "Kein Schatten" },
         { "value": "soft", "label": "Weich (Empfohlen)" },
