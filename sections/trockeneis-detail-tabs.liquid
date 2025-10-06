@@ -74,6 +74,9 @@
     color: var(--hero-text);
     padding: 48px 0;
   }
+  #te-detail-{{ section.id }} .te-hero-band .te-h1 {
+    color: {{ section.settings.hero_title_color }};
+  }
   #te-detail-{{ section.id }} .te-breadcrumb.small { opacity:.9; margin: 0 0 8px; }
   #te-detail-{{ section.id }} .te-breadcrumb a { color: inherit; text-decoration: none; opacity:.85; }
   #te-detail-{{ section.id }} .te-breadcrumb a:hover { opacity: 1; text-decoration: underline; }
@@ -385,7 +388,8 @@
       { "type": "header", "content": "Hero-Band Farben" },
       { "type": "color", "id": "hero_start", "label": "Hero Verlauf Start", "default": "#0b1220" },
       { "type": "color", "id": "hero_end", "label": "Hero Verlauf Ende", "default": "#0f172a" },
-      { "type": "color", "id": "hero_text", "label": "Hero Text", "default": "#e6f6ff" },
+      { "type": "color", "id": "hero_text", "label": "Hero Text (Allgemein)", "default": "#e6f6ff" },
+      { "type": "color", "id": "hero_title_color", "label": "Hero Titel Farbe", "default": "#ffffff" },
       { "type": "header", "content": "Typografie" },
       { "type": "range", "id": "fs_base", "label": "Body Schriftgröße (px)", "min": 14, "max": 20, "step": 1, "default": 16 },
       { "type": "range", "id": "fs_h1", "label": "H1 Schriftgröße (px)", "min": 28, "max": 64, "step": 1, "default": 44 },
