@@ -1,249 +1,187 @@
-{% comment %} ============================================================================
-  1. CSS-DATEI (wird im 'assets'-Ordner erwartet)
-============================================================================ {% endcomment %}
+{% comment %}
+  Custom Header Section
+  - Logo: Text oder Bild
+  - Menü: auswählbar
+  - Menü fett: ja/nein
+  - Farben: Hover / Aktiv
+  - X/Y-Verschiebung: Logo & Menü (in %)
+  - Icons: Warenkorb / Benutzerkonto optional
+{% endcomment %}
+
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
 
-
-{% comment %} ============================================================================
-  2. CSS-VARIABLEN & INLINE-STILE
-============================================================================ {% endcomment %}
-<style>
-  .custom-header-section-{{ section.id }}{
-    --header-bg-color: {{ section.settings.background_color }};
-    --padding-vertical: {{ section.settings.padding_vertical }}px;
-    --padding-horizontal: {{ section.settings.padding_horizontal }}px;
-    --logo-height: {{ section.settings.logo_height | default: 40 }}px;
-    --header-min-height: calc(var(--logo-height) + (var(--padding-vertical) * 2));
-    --brand-gap: 16px;
-
-    /* Positionierung */
-    --logo-offset-x: {{ section.settings.logo_offset_x }}px;
-    --logo-offset-y: {{ section.settings.logo_offset_y }}px;
-    --menu-offset-x: {{ section.settings.menu_offset_x }}px;
-    --menu-offset-y: {{ section.settings.menu_offset_y }}px;
-
-    /* Navigation Typo */
-    --nav-font-family: {{ section.settings.nav_font.family }}, {{ section.settings.nav_font.fallback_families }};
-    --nav-font-style: {{ section.settings.nav_font.style }};
-    --nav-font-weight: {% if section.settings.nav_font_bold %}bold{% else %}{{ section.settings.nav_font.weight }}{% endif %};
-    --nav-text-color: {{ section.settings.nav_text_color }};
-    --nav-hover-color: {{ section.settings.nav_hover_color }};
-    --nav-font-size: {{ section.settings.nav_font_size }}px;
-
-    /* Button Farben */
-    --btn-text-color: {{ section.settings.button_text_color }};
-    --btn-bg-color: {{ section.settings.button_bg_color }};
-    --btn-hover-text-color: {{ section.settings.button_hover_text_color }};
-    --btn-hover-bg-color: {{ section.settings.button_hover_bg_color }};
-
-    /* Zurück-Button Typo */
-    --back-font-family: {{ section.settings.back_font.family }}, {{ section.settings.back_font.fallback_families }};
-    --back-font-style: {{ section.settings.back_font.style }};
-    --back-font-weight: {% if section.settings.back_font_bold %}bold{% else %}{{ section.settings.back_font.weight }}{% endif %};
-    --back-text-color: {{ section.settings.back_text_color }};
-    --back-hover-color: {{ section.settings.back_hover_color }};
-    --back-font-size: {{ section.settings.back_font_size }}px;
-  }
-  
-  #sticky-header-{{ section.id }}{ position:fixed; top:0; left:0; right:0; z-index:1000; width:100%; }
-  @media (min-width: 991px){ .custom-header__cta-mobile{ display:none !important; } }
-  @media (max-width: 990px){ .custom-header__cta-mobile{ display:flex; } }
-</style>
-
-
-{% comment %} ============================================================================
-  3. HTML-STRUKTUR
-============================================================================ {% endcomment %}
-<header id="sticky-header-{{ section.id }}" class="custom-header-section custom-header-section-{{ section.id }}">
-  <div class="custom-header__container">
-
-    <div class="custom-header__brand">
-      <a href="{{ shop.url }}" class="custom-header__logo">
-        {% if section.settings.logo %}
-          {% liquid
-            assign h = section.settings.logo_height | default: 40
-            assign w = h | times: section.settings.logo.aspect_ratio | round
-          %}
-          <img src="{{ section.settings.logo | image_url: width: w }}"
-               alt="{{ section.settings.logo.alt | default: shop.name }}"
-               class="custom-header__logo-img"
-               height="{{ h }}" width="{{ w }}"
-               loading="lazy">
+<header
+  class="ch-header"
+  style="
+    --ch-hover: {{ section.settings.hover_color }};
+    --ch-active: {{ section.settings.active_color }};
+    --ch-logo-x: {{ section.settings.logo_offset_x | default: 0 }}%;
+    --ch-logo-y: {{ section.settings.logo_offset_y | default: 0 }}%;
+    --ch-menu-x: {{ section.settings.menu_offset_x | default: 0 }}%;
+    --ch-menu-y: {{ section.settings.menu_offset_y | default: 0 }}%;
+    --ch-menu-weight: {% if section.settings.menu_bold %}700{% else %}400{% endif %};
+  "
+  role="banner"
+>
+  <div class="ch-inner">
+    <!-- Logo -->
+    <div class="ch-logo-wrap" style="transform: translate(var(--ch-logo-x), var(--ch-logo-y));">
+      {% if section.settings.logo_type == 'text' %}
+        {% assign logo_text = section.settings.logo_text | default: shop.name %}
+        <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+          {{ logo_text }}
+        </a>
+      {% else %}
+        {% if section.settings.logo_image != blank %}
+          <a class="ch-logo ch-logo--image" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+            <img
+              src="{{ section.settings.logo_image | image_url: width: 300 }}"
+              srcset="{{ section.settings.logo_image | image_url: width: 150 }} 150w, {{ section.settings.logo_image | image_url: width: 300 }} 300w, {{ section.settings.logo_image | image_url: width: 600 }} 600w"
+              sizes="(max-width: 600px) 150px, 200px"
+              width="{{ section.settings.logo_image.width }}"
+              height="{{ section.settings.logo_image.height }}"
+              alt="{{ section.settings.logo_alt | escape }}"
+              loading="eager"
+            >
+          </a>
         {% else %}
-          <span class="custom-header__logo-text"
-                style="color: {{ section.settings.logo_color }}; font-size: {{ section.settings.logo_font_size }}px;">
-            {{ section.settings.logo_text | default: shop.name }}
-          </span>
-        {% endif %}
-      </a>
-
-      {% if section.settings.show_back_button %}
-        {% if section.settings.back_link != blank or section.settings.back_label != blank %}
-          <a href="{{ section.settings.back_link | default: shop.url }}" class="custom-header__back" aria-label="{{ section.settings.back_label | default: 'Zurück' }}">
-            <svg class="custom-header__back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            {% if section.settings.back_label != blank %}
-              <span class="custom-header__back-label">{{ section.settings.back_label }}</span>
-            {% endif %}
+          <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+            {{ shop.name }}
           </a>
         {% endif %}
       {% endif %}
     </div>
 
-    <div class="custom-header__right-side">
-      <div class="custom-header__nav-wrapper">
-        <nav class="custom-header__nav" role="navigation">
-          {%- for link in section.settings.menu.links -%}
-            <a href="{{ link.url }}" class="custom-header__nav-link {% if link.active %}active{% endif %}">{{ link.title }}</a>
-          {%- endfor -%}
-        </nav>
-        {%- if section.settings.button_text != blank and section.settings.button_link != blank -%}
-          <a href="{{ section.settings.button_link }}" class="custom-header__contact-btn">{{ section.settings.button_text }}</a>
-        {%- endif -%}
-      </div>
+    <!-- Navigation -->
+    <nav class="ch-nav" style="transform: translate(var(--ch-menu-x), var(--ch-menu-y));" aria-label="Hauptmenü">
+      {% if section.settings.main_menu != blank %}
+        <ul class="ch-menu" role="list">
+          {% for link in linklists[section.settings.main_menu].links %}
+            {% assign is_active = link.active %}
+            <li class="ch-menu__item">
+              <a
+                href="{{ link.url }}"
+                class="ch-menu__link {% if is_active %}is-active{% endif %}"
+                aria-current="{% if is_active %}page{% endif %}"
+              >
+                {{ link.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="ch-menu--placeholder">
+          <em>Bitte ein Menü in den Section-Einstellungen auswählen.</em>
+        </div>
+      {% endif %}
+    </nav>
 
-      {% if section.settings.button_text != blank and section.settings.button_link != blank %}
-        <a href="{{ section.settings.button_link }}" class="custom-header__contact-btn custom-header__cta-mobile">
-          {{ section.settings.button_text }}
+    <!-- Actions / Icons -->
+    <div class="ch-actions">
+      {% if section.settings.show_account_icon %}
+        <a class="ch-icon-link" href="{{ routes.account_url }}" aria-label="Benutzerkonto">
+          <span class="ch-icon" aria-hidden="true">
+            <!-- User Icon -->
+            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+              <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/>
+            </svg>
+          </span>
         </a>
       {% endif %}
 
-      <button class="custom-header__mobile-toggle" aria-label="Menü öffnen" aria-controls="mobile-drawer-{{ section.id }}" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      {% if section.settings.show_cart_icon %}
+        <a class="ch-icon-link" href="{{ routes.cart_url }}" aria-label="Warenkorb">
+          <span class="ch-icon" aria-hidden="true">
+            <!-- Cart Icon -->
+            <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+              <path d="M7 18a2 2 0 1 0 2 2 2 2 0 0 0-2-2zm10 0a2 2 0 1 0 2 2 2 2 0 0 0-2-2zM7.16 14h9.45a2 2 0 0 0 1.92-1.47L20.88 6H6.21l-.94-3H2v2h2l3.6 10.59A2 2 0 0 0 9.5 17H19v-2H9.5z"/>
+            </svg>
+          </span>
+          {% if cart != empty and cart.item_count > 0 %}
+            <span class="ch-cart-count" aria-live="polite">{{ cart.item_count }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
     </div>
-
-    <div class="custom-header__overlay" data-drawer-overlay hidden></div>
-    <aside id="mobile-drawer-{{ section.id }}" class="custom-header__drawer" aria-hidden="true" tabindex="-1">
-      <div class="custom-header__drawer-header">
-        <p class="custom-header__drawer-title">{{ section.settings.logo_text | default: shop.name }}</p>
-        <button class="custom-header__drawer-close" aria-label="Menü schließen">
-          <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-      <nav class="custom-header__drawer-nav" role="navigation" aria-label="Mobile Navigation">
-        {%- for link in section.settings.menu.links -%}
-          <a href="{{ link.url }}" class="custom-header__drawer-link {% if link.active %}active{% endif %}">{{ link.title }}</a>
-        {%- endfor -%}
-      </nav>
-      {%- if section.settings.button_text != blank and section.settings.button_link != blank -%}
-        <div class="custom-header__drawer-cta">
-          <a href="{{ section.settings.button_link }}" class="custom-header__contact-btn" style="width:100%; text-align:center;">
-            {{ section.settings.button_text }}
-          </a>
-        </div>
-      {%- endif -%}
-    </aside>
   </div>
 </header>
 
-
-{% comment %} ============================================================================
-  4. JAVASCRIPT
-============================================================================ {% endcomment %}
-<script>
-  (function(){
-    const header = document.getElementById('sticky-header-{{ section.id }}');
-    if(!header) return;
-    const setHeaderPadding = () => {
-      let headerHeight = header.offsetHeight;
-      const announcementBar = document.querySelector('.announcement-bar, [data-announcement-bar]');
-      if (announcementBar) {
-        header.style.top = `${announcementBar.offsetHeight}px`;
-        headerHeight += announcementBar.offsetHeight;
-      } else {
-        header.style.top = '0px';
-      }
-      document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
-      document.body.style.paddingTop = `${headerHeight}px`;
-    };
-    setHeaderPadding();
-    window.addEventListener('resize', setHeaderPadding);
-    if('ResizeObserver' in window) new ResizeObserver(setHeaderPadding).observe(header);
-  })();
-
-  (function(){
-    const header = document.getElementById('sticky-header-{{ section.id }}');
-    if (!header) return;
-    const toggle = header.querySelector('.custom-header__mobile-toggle');
-    const drawer = document.getElementById('mobile-drawer-{{ section.id }}');
-    const overlay = header.querySelector('[data-drawer-overlay]');
-    const closeBtn = header.querySelector('.custom-header__drawer-close');
-
-    const openDrawer = () => {
-      if(!drawer) return;
-      header.classList.add('is-drawer-open');
-      drawer.setAttribute('aria-hidden', 'false');
-      toggle?.setAttribute('aria-expanded', 'true');
-      if (overlay) overlay.hidden = false;
-      document.documentElement.classList.add('no-scroll');
-    };
-
-    const closeDrawer = () => {
-      if(!drawer) return;
-      header.classList.remove('is-drawer-open');
-      drawer.setAttribute('aria-hidden', 'true');
-      toggle?.setAttribute('aria-expanded', 'false');
-      document.documentElement.classList.remove('no-scroll');
-      setTimeout(() => { if (overlay) overlay.hidden = true; }, 300);
-    };
-
-    toggle?.addEventListener('click', () => header.classList.contains('is-drawer-open') ? closeDrawer() : openDrawer());
-    overlay?.addEventListener('click', closeDrawer);
-    closeBtn?.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e) => e.key === 'Escape' && closeDrawer());
-  })();
-</script>
-
-
-{% comment %} ============================================================================
-  5. SCHEMA (EINSTELLUNGEN FÜR DEN CUSTOMIZER)
-============================================================================ {% endcomment %}
 {% schema %}
 {
-  "name": "Sticky Header (Custom)",
-  "class": "shopify-section-header",
+  "name": "Custom Header",
+  "tag": "section",
+  "class": "section-custom-header",
   "settings": [
-    { "type": "color", "id": "background_color", "label": "Hintergrundfarbe", "default": "#ffffff" },
-    { "type": "range", "id": "padding_vertical", "label": "Padding Oben/Unten", "min": 0, "max": 50, "step": 1, "default": 16, "unit": "px" },
-    { "type": "range", "id": "padding_horizontal", "label": "Padding Links/Rechts", "min": 0, "max": 100, "step": 1, "default": 24, "unit": "px" },
-
-    { "type": "header", "content": "Zurück-Pfeil" },
-    { "type": "checkbox", "id": "show_back_button", "label": "Zurück-Button anzeigen", "default": true },
-    { "type": "url", "id": "back_link", "label": "Link für Zurück-Pfeil" },
-    { "type": "text", "id": "back_label", "label": "Text neben Pfeil (optional)", "default": "Zurück" },
-    { "type": "font_picker", "id": "back_font", "label": "Schriftart", "default": "sans-serif" },
-    { "type": "checkbox", "id": "back_font_bold", "label": "Fett", "default": false },
-    { "type": "color", "id": "back_text_color", "label": "Farbe", "default": "#374151" },
-    { "type": "color", "id": "back_hover_color", "label": "Farbe (Hover)", "default": "#4ade80" },
-    { "type": "range", "id": "back_font_size", "label": "Schriftgröße", "min": 12, "max": 28, "step": 1, "default": 16, "unit": "px" },
-
     { "type": "header", "content": "Logo" },
-    { "type": "image_picker", "id": "logo", "label": "Logo Bild" },
-    { "type": "range", "id": "logo_height", "label": "Logo-Höhe", "min": 20, "max": 120, "step": 1, "default": 40, "unit": "px" },
-    { "type": "text", "id": "logo_text", "label": "Logo Text (Fallback)", "default": "Mein Shop" },
-    { "type": "color", "id": "logo_color", "label": "Logo Textfarbe", "default": "#1e40af" },
-    { "type": "range", "id": "logo_font_size", "label": "Logo Schriftgröße", "min": 16, "max": 48, "step": 1, "default": 24, "unit": "px" },
-    { "type": "range", "id": "logo_offset_x", "label": "Position Horizontal (X)", "min": -50, "max": 50, "step": 1, "default": 0, "unit": "px" },
-    { "type": "range", "id": "logo_offset_y", "label": "Position Vertikal (Y)", "min": -50, "max": 50, "step": 1, "default": 0, "unit": "px" },
+    {
+      "type": "radio",
+      "id": "logo_type",
+      "label": "Logo-Typ",
+      "options": [
+        { "value": "text", "label": "Schriftzug" },
+        { "value": "image", "label": "Bild" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Schriftzug (falls 'Schriftzug' gewählt)",
+      "default": "Mein Shop"
+    },
+    { "type": "image_picker", "id": "logo_image", "label": "Logobild (falls 'Bild' gewählt)" },
+    { "type": "text", "id": "logo_alt", "label": "Alt-Text für Logobild", "default": "Shop-Logo" },
 
-    { "type": "header", "content": "Navigation & Menü" },
-    { "type": "link_list", "id": "menu", "label": "Menü auswählen", "default": "main-menu" },
-    { "type": "font_picker", "id": "nav_font", "label": "Schriftart", "default": "sans-serif" },
-    { "type": "checkbox", "id": "nav_font_bold", "label": "Fett", "default": false },
-    { "type": "color", "id": "nav_text_color", "label": "Textfarbe", "default": "#374151" },
-    { "type": "color", "id": "nav_hover_color", "label": "Hover-Farbe", "default": "#4ade80" },
-    { "type": "range", "id": "nav_font_size", "label": "Schriftgröße", "min": 12, "max": 24, "step": 1, "default": 16, "unit": "px" },
-    { "type": "range", "id": "menu_offset_x", "label": "Position Horizontal (X)", "min": -50, "max": 50, "step": 1, "default": 0, "unit": "px" },
-    { "type": "range", "id": "menu_offset_y", "label": "Position Vertikal (Y)", "min": -50, "max": 50, "step": 1, "default": 0, "unit": "px" },
+    {
+      "type": "range",
+      "id": "logo_offset_x",
+      "label": "Logo X-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "logo_offset_y",
+      "label": "Logo Y-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
 
-    { "type": "header", "content": "Kontakt Button" },
-    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Kontakt" },
-    { "type": "url", "id": "button_link", "label": "Button Link" },
-    { "type": "color", "id": "button_text_color", "label": "Textfarbe", "default": "#ffffff" },
-    { "type": "color", "id": "button_bg_color", "label": "Hintergrund", "default": "#4ade80" },
-    { "type": "color", "id": "button_hover_text_color", "label": "Textfarbe (Hover)", "default": "#ffffff" },
-    { "type": "color", "id": "button_hover_bg_color", "label": "Hintergrund (Hover)", "default": "#22c55e" }
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "main_menu", "label": "Menü auswählen" },
+    { "type": "checkbox", "id": "menu_bold", "label": "Menü fett darstellen", "default": false },
+
+    {
+      "type": "range",
+      "id": "menu_offset_x",
+      "label": "Menü X-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "menu_offset_y",
+      "label": "Menü Y-Verschiebung (%)",
+      "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0
+    },
+
+    {
+      "type": "color",
+      "id": "hover_color",
+      "label": "Farbe beim Hover über Menüpunkt",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "active_color",
+      "label": "Farbe für aktiven Menüpunkt",
+      "default": "#000000"
+    },
+
+    { "type": "header", "content": "Icons" },
+    { "type": "checkbox", "id": "show_cart_icon", "label": "Warenkorb-Icon anzeigen", "default": true },
+    { "type": "checkbox", "id": "show_account_icon", "label": "Benutzerkonto-Icon anzeigen", "default": false }
   ],
-  "presets": [{ "name": "Sticky Header (Custom)" }]
+  "blocks": [],
+  "presets": [
+    { "name": "Custom Header", "category": "Header" }
+  ]
 }
 {% endschema %}
