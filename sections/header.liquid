@@ -1,15 +1,20 @@
 {% comment %}
-  Custom Header Section (Dawn-kompatibel, ohne Extra-Script)
+  Custom Header Section – Dawn-kompatibel
   - Logo: Text oder Bild
-  - Menü: auswählbar
-  - Menü fett: ja/nein
+  - Menü-Auswahl, fett/normal
   - Hover-/Aktiv-Farbe
-  - X/Y-Verschiebung: Logo & Menü (in %)
-  - Icons: Warenkorb / Benutzerkonto optional
-  - Cart-Drawer: nutzt Dawns Hook über #cart-icon-bubble
+  - X/Y-Offsets in %
+  - Account-/Cart-Icons mit Dawn-Hooks & deinen SVGs
 {% endcomment %}
 
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%} Dawn-Komponenten laden (wie im Original-Header) {%- endcomment -%}
+<link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-cart-notification.css' | asset_url }}" media="print" onload="this.media='all'">
+<script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
 
 <header
   class="ch-header"
@@ -25,7 +30,7 @@
   role="banner"
 >
   <div class="ch-inner">
-    <!-- Logo -->
+    {%- comment -%} Logo {%- endcomment -%}
     <div class="ch-logo-wrap" style="transform: translate(var(--ch-logo-x), var(--ch-logo-y));">
       {% if section.settings.logo_type == 'text' %}
         {% assign logo_text = section.settings.logo_text | default: shop.name %}
@@ -46,75 +51,84 @@
             >
           </a>
         {% else %}
-          <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
-            {{ shop.name }}
-          </a>
+          <a class="ch-logo ch-logo--text" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">{{ shop.name }}</a>
         {% endif %}
       {% endif %}
     </div>
 
-    <!-- Navigation -->
+    {%- comment -%} Navigation {%- endcomment -%}
     <nav class="ch-nav" style="transform: translate(var(--ch-menu-x), var(--ch-menu-y));" aria-label="Hauptmenü">
       {% if section.settings.main_menu != blank %}
         <ul class="ch-menu" role="list">
           {% for link in linklists[section.settings.main_menu].links %}
             {% assign is_active = link.active %}
             <li class="ch-menu__item">
-              <a
-                href="{{ link.url }}"
-                class="ch-menu__link {% if is_active %}is-active{% endif %}"
-                aria-current="{% if is_active %}page{% endif %}"
-              >
+              <a href="{{ link.url }}" class="ch-menu__link {% if is_active %}is-active{% endif %}" aria-current="{% if is_active %}page{% endif %}">
                 {{ link.title }}
               </a>
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <div class="ch-menu--placeholder">
-          <em>Bitte ein Menü in den Section-Einstellungen auswählen.</em>
-        </div>
+        <div class="ch-menu--placeholder"><em>Bitte ein Menü in den Section-Einstellungen auswählen.</em></div>
       {% endif %}
     </nav>
 
-    <!-- Actions / Icons -->
+    {%- comment -%} Actions / Icons (Dawn-konform) {%- endcomment -%}
     <div class="ch-actions">
-      {% if section.settings.show_account_icon %}
-        <a class="ch-icon-link"
-           href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
-           aria-label="Benutzerkonto">
-          <img class="ch-icon-img" src="{{ 'icon-account.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
+      {% if section.settings.show_account_icon and shop.customer_accounts_enabled %}
+        <a
+          href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+          class="header__icon header__icon--account link focus-inset"
+          rel="nofollow"
+          aria-label="Benutzerkonto"
+        >
+          <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+          <span class="visually-hidden">
+            {%- if customer -%}{{ 'customer.account_fallback' | t }}{%- else -%}{{ 'customer.log_in' | t }}{%- endif -%}
+          </span>
         </a>
       {% endif %}
 
       {% if section.settings.show_cart_icon %}
         {%- comment -%}
-          WICHTIG: Die ID 'cart-icon-bubble' aktiviert im Dawn-Theme das Öffnen
-          des Cart-Drawers. Fallback ist die /cart Seite via href.
+          Exakt wie im Dawn-Header:
+          - id="cart-icon-bubble" => JS öffnet Cart-Notification/Drawer
+          - Klassen für Fokus & A11y
         {%- endcomment -%}
-        <a id="cart-icon-bubble"
-           class="ch-icon-link"
-           href="{{ routes.cart_url }}"
-           aria-label="{{ 'sections.header.cart' | t }}">
-          <img class="ch-icon-img" src="{{ 'icon-cart.svg' | asset_url }}" alt="" width="22" height="22" loading="lazy">
+        <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble" aria-label="{{ 'templates.cart.cart' | t }}">
+          {% if cart == empty %}
+            <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+          {% else %}
+            <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+          {% endif %}
+          <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
 
-          <span class="cart-count-bubble" aria-live="polite">
-            {%- if cart != empty and cart.item_count > 0 -%}
-              <span aria-hidden="true">{{ cart.item_count }}</span>
-              <span class="visually-hidden">
-                {{ 'sections.header.cart_count' | t: count: cart.item_count }}
-              </span>
-            {%- endif -%}
-          </span>
+          {%- if cart != empty -%}
+            <div class="cart-count-bubble">
+              {%- if cart.item_count < 100 -%}
+                <span aria-hidden="true">{{ cart.item_count }}</span>
+              {%- endif -%}
+              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+            </div>
+          {%- endif -%}
         </a>
       {% endif %}
     </div>
   </div>
 </header>
 
+{%- comment -%}
+  Genau wie im Dawn-Header: Wenn Cart-Typ "notification", die Notification-Komponente rendern,
+  damit der Klick auf #cart-icon-bubble den Drawer/Overlay nutzt.
+{%- endcomment -%}
+{%- if settings.cart_type == 'notification' -%}
+  {%- render 'cart-notification', color_scheme: settings.color_scheme, desktop_menu_type: 'dropdown' -%}
+{%- endif -%}
+
 {% schema %}
 {
-  "name": "Custom Header",
+  "name": "Custom Header (Dawn kompatibel)",
   "tag": "section",
   "class": "section-custom-header",
   "settings": [
@@ -129,8 +143,8 @@
       ],
       "default": "text"
     },
-    { "type": "text", "id": "logo_text", "label": "Schriftzug (falls 'Schriftzug' gewählt)", "default": "Mein Shop" },
-    { "type": "image_picker", "id": "logo_image", "label": "Logobild (falls 'Bild' gewählt)" },
+    { "type": "text", "id": "logo_text", "label": "Schriftzug (bei 'Schriftzug')", "default": "Mein Shop" },
+    { "type": "image_picker", "id": "logo_image", "label": "Logobild (bei 'Bild')" },
     { "type": "text", "id": "logo_alt", "label": "Alt-Text für Logobild", "default": "Shop-Logo" },
 
     { "type": "range", "id": "logo_offset_x", "label": "Logo X-Verschiebung (%)", "min": -50, "max": 50, "step": 1, "unit": "%", "default": 0 },
@@ -151,8 +165,6 @@
     { "type": "checkbox", "id": "show_account_icon", "label": "Benutzerkonto-Icon anzeigen", "default": false }
   ],
   "blocks": [],
-  "presets": [
-    { "name": "Custom Header", "category": "Header" }
-  ]
+  "presets": [{ "name": "Custom Header", "category": "Header" }]
 }
 {% endschema %}
