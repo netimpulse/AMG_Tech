@@ -1,27 +1,35 @@
 {% comment %}
 ====================================================================================
   1. CSS-STILE
-  Alle CSS-Regeln für den Header. Die erste Regel bindet die CSS-Datei aus den
-  Assets ein, falls du sie nutzt. Die Stile darunter sind direkt hier definiert.
 ====================================================================================
 {% endcomment %}
 {{ 'custom-header.css' | asset_url | stylesheet_tag }}
 
 <style>
-  /* Sticky (fixed) Header – bleibt immer sichtbar */
+  /* KORRIGIERT: Erzwingt, dass der Header die volle Bildschirmbreite einnimmt,
+     unabhängig von übergeordneten Containern. */
   .custom-header-section{
-    position:fixed; top:0; left:0; right:0;
-    z-index:1000; width:100%;
-    background:var(--header-bg-color);
-    box-shadow:0 1px 3px rgba(0,0,0,.1);
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    z-index: 1000;
+    background: var(--header-bg-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
   }
 
-  /* Layout */
+  /* KORRIGIERT: Stellt sicher, dass der Inhalt innerhalb des Headers
+     wieder eine maximale Breite hat und zentriert ist. */
   .custom-header__container{
-    max-width:1200px; margin:0 auto;
-    padding:var(--padding-vertical) var(--padding-horizontal);
-    display:flex; align-items:center; justify-content:space-between;
-    min-height:var(--header-min-height);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: var(--padding-vertical) var(--padding-horizontal);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-min-height);
   }
 
   /* Logo + Zurück zusammen */
@@ -154,7 +162,7 @@
   }
 
   /* Statische Hilfs-Stile */
-  #sticky-header-{{ section.id }}{ position:fixed; top:0; left:0; right:0; z-index:1000; width:100%; }
+  #sticky-header-{{ section.id }}{ top:0; z-index:1000; width:100%; }
   @media (min-width: 991px){ .custom-header__cta-mobile{ display:none !important; } }
   @media (max-width: 990px){ .custom-header__cta-mobile{ display:flex; } }
 </style>
@@ -163,7 +171,6 @@
 {% comment %}
 ====================================================================================
   2. HTML-STRUKTUR
-  Der sichtbare Teil des Headers.
 ====================================================================================
 {% endcomment %}
 <header id="sticky-header-{{ section.id }}" class="custom-header-section custom-header-section-{{ section.id }}">
@@ -252,7 +259,6 @@
 {% comment %}
 ====================================================================================
   3. JAVASCRIPT
-  Funktionalität für das mobile Menü und dynamischen Abstand.
 ====================================================================================
 {% endcomment %}
 <script>
@@ -313,7 +319,6 @@
 {% comment %}
 ====================================================================================
   4. SCHEMA
-  Alle Einstellungen für den Shopify Theme Customizer.
 ====================================================================================
 {% endcomment %}
 {% schema %}
