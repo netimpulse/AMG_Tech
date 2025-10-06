@@ -1,0 +1,86 @@
+/* ===== Hero Ice (standalone, ohne Framework) ===== */
+.hero-ice {
+  position: relative;
+  color: var(--hero-text, #e6f6ff);
+  padding: var(--hero-pad-y, 96px) 0;
+  overflow: hidden;
+}
+.hero-ice .page-width { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Background: Bild (optional) + Verlauf + optionaler Film */
+.hero-ice__bg { position:absolute; inset:0; z-index:0; overflow:hidden; }
+.hero-ice__bg .media { position:absolute; inset:0; }
+.hero-ice__bg img { width:100%; height:100%; object-fit: cover; object-position: center; filter: saturate(100%); opacity:.25; }
+.hero-ice__gradient { position:absolute; inset:-20% -5% -5% -5%;
+  background: radial-gradient(1200px 600px at 70% -10%, rgba(14,165,233,.25), transparent 60%),
+              linear-gradient(180deg, var(--hero-gradient-start, #0b1220) 0%, var(--hero-gradient-start, #0b1220) 55%, var(--hero-gradient-end, #0f172a) 100%);
+}
+.hero-ice__tint { position:absolute; inset:0; background: var(--hero-overlay, transparent); }
+
+.hero-ice__container { position:relative; z-index:2; }
+.hero-ice__grid { display:grid; gap:32px; align-items:center; }
+@media (min-width: 992px){ .hero-ice__grid { grid-template-columns: 1.1fr 0.9fr; } }
+
+/* Content */
+.hero-ice__content { max-width: var(--content-max, 720px); }
+.hero-ice__content.is-center { text-align:center; margin-inline:auto; }
+.hero-ice__badge {
+  display:inline-block; padding:8px 14px; border-radius:999px; 
+  background: var(--badge-bg, #d7f2f9); color: var(--badge-text, #0b5e6f);
+  font-weight: var(--badge-weight, 700); margin-bottom: 14px;
+}
+.hero-ice__h1 {
+  margin: 0 0 12px; font-weight: var(--h1-weight, 900);
+  font-size: clamp(28px, 3.6vw, var(--h1-size, 56px));
+  color: var(--h1-color, #fff); line-height: 1.08;
+}
+.hero-ice__accent { display:inline; }
+.hero-ice__lead {
+  margin: 0 0 20px; 
+  color: var(--lead-color, #bfe7ff); 
+  font-size: clamp(16px, 1.8vw, var(--lead-size, 18px)); 
+  font-weight: var(--lead-weight, 400);
+  opacity:.9;
+}
+
+/* Actions / Buttons */
+.hero-ice__actions { display:flex; flex-wrap:wrap; gap:12px; }
+.hero-ice__btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 12px 18px; border-radius: var(--btn-radius, 12px);
+  text-decoration:none; font-weight: 800; transition: .18s ease-in-out;
+  border: 1px solid transparent;
+}
+.hero-ice__btn--primary {
+  background: var(--btn1-bg, #0ea5e9); color: var(--btn1-text, #fff);
+  border-color: var(--btn1-bg, #0ea5e9);
+}
+.hero-ice__btn--primary:hover {
+  background: var(--btn1-bg-h, #0284c7); color: var(--btn1-text-h, #fff);
+  border-color: var(--btn1-bg-h, #0284c7); transform: translateY(-1px);
+}
+.hero-ice__btn--outline {
+  background: var(--btn2-bg, transparent); color: var(--btn2-text, #0ea5e9);
+  border-color: var(--btn2-bd, #0ea5e9);
+}
+.hero-ice__btn--outline:hover {
+  background: var(--btn2-bg-h, #0ea5e9); color: var(--btn2-text-h, #fff);
+  border-color: var(--btn2-bg-h, #0ea5e9); transform: translateY(-1px);
+}
+
+/* Media rechts */
+.hero-ice__media { min-height: 260px; }
+.hero-ice__media-card { position: relative; background: rgba(8,15,30,.75); overflow: hidden; }
+.hero-ice__media .media { display:block; }
+.hero-ice__placeholder { width:100%; aspect-ratio: 16/9; background: radial-gradient(220px 220px at 50% 50%, #cde4f6 0%, #314355 55%, rgba(12,19,31,1) 100%); opacity:.9; }
+
+/* Overlay-Bild frei positionierbar */
+.hero-ice__overlay-img {
+  position:absolute;
+  left: var(--ov-x, 70%); top: var(--ov-y, 30%);
+  transform: translate(-50%, -50%);
+  width: min(var(--ov-w, 70%), 140%);
+  opacity: calc(var(--ov-opacity, 100) / 100);
+  pointer-events:none;
+}
+.hero-ice__overlay-img img { width:100%; height:auto; display:block; }
