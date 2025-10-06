@@ -1,4 +1,27 @@
-{%- comment -%} … Kopf bleibt unverändert {%- endcomment -%}
+{% comment %} 
+  Section: Hero – Ice (strict JSON schema)
+  - Hintergrundbild + Verlauf
+  - Medienbild rechts (Karte)
+  - Optionales Overlay-Bild mit X/Y/Width/Opacity
+  - Badge (ein/aus)
+  - 2 Buttons mit Normal/Hover-Farben
+  - Voll editierbare Typografie via font_picker, Größen, Farben
+  Fixes:
+  - Ungültige JSON im schema behoben (HTML-Entities & ID-Konflikt)
+  - h1_font mit Default-Font-Stack
+{% endcomment %}
+
+{{ 'hero-ice.css' | asset_url | stylesheet_tag }}
+
+{%- assign sec_id = section.id -%}
+
+{%- comment -%} Schatten-Auswahl vorbereiten {%- endcomment -%}
+{%- assign shadow_val = '' -%}
+{%- case section.settings.media_shadow -%}
+  {%- when 'none' -%}{%- assign shadow_val = 'none' -%}
+  {%- when 'soft' -%}{%- assign shadow_val = '0 18px 48px rgba(2,6,23,.28)' -%}
+  {%- when 'hard' -%}{%- assign shadow_val = '0 8px 24px rgba(0,0,0,.35)' -%}
+{%- endcase -%}
 
 <section id="hero-ice-{{ sec_id }}"
   class="hero-ice"
@@ -202,3 +225,6 @@
   ]
 }
 {% endschema %}
+
+{% stylesheet %}{% endstylesheet %}
+{% javascript %}{% endjavascript %}
