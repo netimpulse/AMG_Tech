@@ -1,0 +1,118 @@
+/* Custom Header – Styles */
+
+.ch-header {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  background: var(--color-background, #fff);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.ch-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.ch-logo-wrap { justify-self: start; }
+.ch-nav { justify-self: center; }
+.ch-actions { justify-self: end; display: flex; align-items: center; gap: 12px; position: relative; }
+
+.ch-logo {
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  color: inherit;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ch-logo--image img {
+  display: block;
+  height: auto;
+  max-height: 48px;
+  width: auto;
+}
+
+.ch-menu {
+  display: flex;
+  gap: 22px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.ch-menu__link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: var(--ch-menu-weight, 400);
+  position: relative;
+  padding: 4px 2px;
+  transition: color .18s ease, transform .18s ease;
+}
+
+/* Hover color */
+.ch-menu__link:hover,
+.ch-menu__link:focus {
+  color: var(--ch-hover);
+  outline: none;
+}
+
+/* Active color + underline indicator */
+.ch-menu__link.is-active {
+  color: var(--ch-active);
+}
+.ch-menu__link.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background: var(--ch-active);
+}
+
+/* Icons */
+.ch-icon-link {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+.ch-icon svg { display: block; }
+
+.ch-cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  background: var(--ch-active, #000);
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .ch-inner {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "logo actions"
+      "nav nav";
+  }
+  .ch-logo-wrap { grid-area: logo; }
+  .ch-nav { grid-area: nav; margin-top: 8px; }
+  .ch-actions { grid-area: actions; }
+  .ch-menu { flex-wrap: wrap; gap: 14px; }
+}
