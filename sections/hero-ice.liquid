@@ -1,0 +1,227 @@
+{% comment %} 
+  Section: Hero – Ice (strict JSON schema)
+  - Hintergrundbild + Verlauf
+  - Medienbild rechts (Karte)
+  - Optionales Overlay-Bild mit X/Y/Width/Opacity
+  - Badge (ein/aus)
+  - 2 Buttons mit Normal/Hover-Farben
+  - Voll editierbare Typografie via font_picker, Größen, Farben
+  Fixes:
+  - Ungültige JSON im schema behoben (HTML-Entities & ID-Konflikt)
+  - h1_font mit Default-Font-Stack
+{% endcomment %}
+
+{{ 'hero-ice.css' | asset_url | stylesheet_tag }}
+
+{%- assign sec_id = section.id -%}
+
+{%- comment -%} Schatten-Auswahl vorbereiten {%- endcomment -%}
+{%- assign shadow_val = '' -%}
+{%- case section.settings.media_shadow -%}
+  {%- when 'none' -%}{%- assign shadow_val = 'none' -%}
+  {%- when 'soft' -%}{%- assign shadow_val = '0 18px 48px rgba(2,6,23,.28)' -%}
+  {%- when 'hard' -%}{%- assign shadow_val = '0 8px 24px rgba(0,0,0,.35)' -%}
+{%- endcase -%}
+
+<section id="hero-ice-{{ sec_id }}"
+  class="hero-ice"
+  style="
+    --hero-pad-y: {{ section.settings.pad_y | default: 96 }}px;
+    --hero-radius: {{ section.settings.radius | default: 16 }}px;
+    --hero-gradient-start: {{ section.settings.grad_start }};
+    --hero-gradient-end: {{ section.settings.grad_end }};
+    --hero-text: {{ section.settings.color_text }};
+    --badge-bg: {{ section.settings.badge_bg }};
+    --badge-text: {{ section.settings.badge_text_color }};
+    --badge-weight: {{ section.settings.badge_weight }};
+    --h1-size: {{ section.settings.h1_size }}px;
+    --h1-color: {{ section.settings.h1_color }};
+    --h1-weight: {{ section.settings.h1_weight }};
+    --lead-size: {{ section.settings.lead_size }}px;
+    --lead-color: {{ section.settings.lead_color }};
+    --lead-weight: {{ section.settings.lead_weight }};
+    --btn1-bg: {{ section.settings.btn1_bg }};
+    --btn1-text: {{ section.settings.btn1_text }};
+    --btn1-bg-h: {{ section.settings.btn1_bg_h }};
+    --btn1-text-h: {{ section.settings.btn1_text_h }};
+    --btn2-text: {{ section.settings.btn2_text }};
+    --btn2-bd: {{ section.settings.btn2_bd }};
+    --btn2-bg-h: {{ section.settings.btn2_bg_h }};
+    --btn2-text-h: {{ section.settings.btn2_text_h }};
+    --btn-radius: {{ section.settings.btn_radius }}px;
+    --content-max: {{ section.settings.content_max }}px;
+    --media-shadow: {{ shadow_val }};
+  "
+>
+  <div class="hero-ice__bg">
+    {% if section.settings.bg_image != blank %}
+      {%- render 'image', image: section.settings.bg_image, widths: '720,960,1200,1600,2000', sizes: '(min-width: 992px) 50vw, 100vw', alt: section.settings.bg_image.alt | default: section.settings.heading -%}
+    {% endif %}
+    <div class="hero-ice__gradient"></div>
+    {% if section.settings.overlay_gradient or section.settings.overlay_color != blank %}
+      <div class="hero-ice__tint"
+           style="
+             background: {{ section.settings.overlay_color | default: '#000000' }};
+             opacity: {{ section.settings.tint_opacity | default: 0 | times: 0.01 }};
+           ">
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="hero-ice__container page-width">
+    <div class="hero-ice__grid">
+      <div class="hero-ice__content {% if section.settings.align_desktop == 'center' %}is-center{% else %}is-left{% endif %}">
+        {% if section.settings.show_badge and section.settings.badge_text != blank %}
+          <span class="hero-ice__badge" style="font-weight: {{ section.settings.badge_weight }};">
+            {{ section.settings.badge_text }}
+          </span>
+        {% endif %}
+
+        <h1 class="hero-ice__h1"
+            style="font-family: {% if section.settings.h1_font != blank %}{{ section.settings.h1_font.family }}, {{ section.settings.h1_font.fallback }}{% else %}system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif{% endif %};">
+          {{ section.settings.heading | escape }}
+          {% if section.settings.heading_accent != blank %}
+            <span class="hero-ice__accent" style="color: {{ section.settings.h1_accent_color }};">
+              {{ section.settings.heading_accent | escape }}
+            </span>
+          {% endif %}
+        </h1>
+
+        {% if section.settings.lead != blank %}
+          <p class="hero-ice__lead"
+             style="font-family: {% if section.settings.lead_font != blank %}{{ section.settings.lead_font.family }}, {{ section.settings.lead_font.fallback }}{% else %}system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif{% endif %};">
+            {{ section.settings.lead }}
+          </p>
+        {% endif %}
+
+        <div class="hero-ice__actions">
+          {% if section.settings.btn1_label != blank %}
+            <a class="hero-ice__btn hero-ice__btn--primary"
+               href="{{ section.settings.btn1_url }}"
+               aria-label="{{ section.settings.btn1_label | escape }}">
+              {{ section.settings.btn1_label }}
+            </a>
+          {% endif %}
+          {% if section.settings.btn2_label != blank %}
+            <a class="hero-ice__btn hero-ice__btn--outline"
+               href="{{ section.settings.btn2_url }}"
+               aria-label="{{ section.settings.btn2_label | escape }}">
+              {{ section.settings.btn2_label }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="hero-ice__media">
+        <div class="hero-ice__media-card" style="border-radius: var(--hero-radius); box-shadow: var(--media-shadow);">
+          {% if section.settings.media_image != blank %}
+            {%- render 'image', image: section.settings.media_image, widths: '720,960,1200', sizes: '(min-width: 992px) 50vw, 100vw', alt: section.settings.media_image.alt | default: 'Hero media' -%}
+          {% else %}
+            <div class="hero-ice__placeholder"></div>
+          {% endif %}
+
+          {% if section.settings.overlay_image != blank %}
+            <div class="hero-ice__overlay-img"
+                 style="
+                   --ov-x: {{ section.settings.ov_x }}%;
+                   --ov-y: {{ section.settings.ov_y }}%;
+                   --ov-w: {{ section.settings.ov_w }}%;
+                   --ov-opacity: {{ section.settings.ov_opacity }}%;
+                 ">
+              {%- render 'image', image: section.settings.overlay_image, widths: '360,600,900', sizes: '40vw', alt: section.settings.overlay_image.alt | default: 'Overlay' -%}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero – Ice",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "range", "id": "pad_y", "label": "Vertikaler Innenabstand (px)", "min": 32, "max": 160, "step": 4, "default": 96 },
+    { "type": "range", "id": "radius", "label": "Kartenradius (px)", "min": 0, "max": 32, "step": 1, "default": 16 },
+
+    { "type": "color", "id": "grad_start", "label": "Gradient Start", "default": "#0b1220" },
+    { "type": "color", "id": "grad_end", "label": "Gradient Ende", "default": "#0f172a" },
+    { "type": "checkbox", "id": "overlay_gradient", "label": "Dunklen Overlay-Film anzeigen", "default": true },
+    { "type": "color", "id": "overlay_color", "label": "Overlay-Farbe (HEX)", "default": "#000000" },
+    { "type": "range", "id": "tint_opacity", "label": "Overlay-Film Deckkraft (%)", "min": 0, "max": 100, "step": 5, "default": 0 },
+
+    { "type": "color", "id": "color_text", "label": "Allgemeine Textfarbe", "default": "#e6f6ff" },
+
+    { "type": "header", "content": "Hintergrund & Medien" },
+    { "type": "image_picker", "id": "bg_image", "label": "Hintergrundbild (vollflächig)" },
+    { "type": "image_picker", "id": "media_image", "label": "Medienbild rechts (Karte)" },
+
+    { "type": "header", "content": "Overlay-Bild (frei positionierbar)" },
+    { "type": "image_picker", "id": "overlay_image", "label": "Overlay-Grafik" },
+    { "type": "range", "id": "ov_x", "label": "Overlay X (%) – von links", "min": 0, "max": 100, "step": 1, "default": 70 },
+    { "type": "range", "id": "ov_y", "label": "Overlay Y (%) – von oben", "min": 0, "max": 100, "step": 1, "default": 30 },
+    { "type": "range", "id": "ov_w", "label": "Overlay Breite (%) relativ zur Karte", "min": 10, "max": 110, "step": 1, "default": 70 },
+    { "type": "range", "id": "ov_opacity", "label": "Overlay-Bild Deckkraft (%)", "min": 0, "max": 100, "step": 5, "default": 100 },
+
+    { "type": "header", "content": "Badge" },
+    { "type": "text", "id": "badge_text", "label": "Badge-Text", "default": "Frisches Trockeneis aus der Region" },
+    { "type": "checkbox", "id": "show_badge", "label": "Badge anzeigen", "default": true },
+    { "type": "color", "id": "badge_bg", "label": "Badge Hintergrund", "default": "#d7f2f9" },
+    { "type": "color", "id": "badge_text_color", "label": "Badge Textfarbe", "default": "#0b5e6f" },
+    { "type": "range", "id": "badge_weight", "label": "Badge Schriftstärke", "min": 400, "max": 900, "step": 100, "default": 700 },
+
+    { "type": "header", "content": "Texte" },
+    { "type": "text", "id": "heading", "label": "H1 – Haupttext", "default": "Kühlen, Reinigen, Strahlen —" },
+    { "type": "text", "id": "heading_accent", "label": "H1 – Akzentwort", "default": "mit Trockeneis" },
+    { "type": "color", "id": "h1_color", "label": "H1 Farbe", "default": "#ffffff" },
+    { "type": "color", "id": "h1_accent_color", "label": "H1 Akzentfarbe", "default": "#00b4e6" },
+    { "type": "font_picker", "id": "h1_font", "label": "H1 Schriftart", "default": "sans-serif" },
+    { "type": "range", "id": "h1_size", "label": "H1 Größe (px)", "min": 24, "max": 80, "step": 1, "default": 56 },
+    { "type": "range", "id": "h1_weight", "label": "H1 Gewicht", "min": 300, "max": 900, "step": 100, "default": 900 },
+
+    { "type": "richtext", "id": "lead", "label": "Lead-Text", "default": "<p>Lebensmittelechte Pellets, schnelle Lieferung und professionelle Beratung. Anwendungen von Versand &amp; Kühlung bis zur industriellen Reinigung ohne Chemie.</p>" },
+    { "type": "font_picker", "id": "lead_font", "label": "Lead Schriftart", "default": "sans-serif" },
+    { "type": "color", "id": "lead_color", "label": "Lead Farbe", "default": "#bfe7ff" },
+    { "type": "range", "id": "lead_size", "label": "Lead Größe (px)", "min": 14, "max": 28, "step": 1, "default": 18 },
+    { "type": "range", "id": "lead_weight", "label": "Lead Gewicht", "min": 300, "max": 700, "step": 100, "default": 400 },
+    { "type": "range", "id": "content_max", "label": "Max. Textbreite (px)", "min": 480, "max": 900, "step": 10, "default": 720 },
+
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "btn1_label", "label": "Primärer Button – Label", "default": "Jetzt Trockeneis kaufen" },
+    { "type": "url", "id": "btn1_url", "label": "Primärer Button – Link" },
+    { "type": "color", "id": "btn1_bg", "label": "Primär – Hintergrund", "default": "#0ea5e9" },
+    { "type": "color", "id": "btn1_text", "label": "Primär – Textfarbe", "default": "#ffffff" },
+    { "type": "color", "id": "btn1_bg_h", "label": "Primär – Hover Hintergrund", "default": "#0284c7" },
+    { "type": "color", "id": "btn1_text_h", "label": "Primär – Hover Text", "default": "#ffffff" },
+
+    { "type": "text", "id": "btn2_label", "label": "Sekundärer Button – Label", "default": "Strahlservice entdecken" },
+    { "type": "url", "id": "btn2_url", "label": "Sekundärer Button – Link" },
+    { "type": "color", "id": "btn2_bd", "label": "Sekundär – Rahmenfarbe", "default": "#0ea5e9" },
+    { "type": "color", "id": "btn2_text", "label": "Sekundär – Textfarbe", "default": "#0ea5e9" },
+    { "type": "color", "id": "btn2_bg_h", "label": "Sekundär – Hover Hintergrund", "default": "#0ea5e9" },
+    { "type": "color", "id": "btn2_text_h", "label": "Sekundär – Hover Text", "default": "#ffffff" },
+    { "type": "range", "id": "btn_radius", "label": "Button-Radius (px)", "min": 0, "max": 24, "step": 1, "default": 12 },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "align_desktop", "label": "Textausrichtung (Desktop)", "default": "left", "options": [
+      { "value": "left", "label": "Links" },
+      { "value": "center", "label": "Zentriert" }
+    ]},
+    { "type": "select", "id": "media_shadow", "label": "Schatten Medienkarte", "default": "soft",
+      "options": [
+        { "value": "none", "label": "Kein Schatten" },
+        { "value": "soft", "label": "Weich (Empfohlen)" },
+        { "value": "hard", "label": "Kontrastreich" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Hero – Ice" }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}{% endstylesheet %}
+{% javascript %}{% endjavascript %}
