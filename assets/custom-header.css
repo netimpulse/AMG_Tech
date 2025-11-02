@@ -1,0 +1,354 @@
+/* ===============================================
+   CUSTOM HEADER STYLES
+   =============================================== */
+
+/* Header Container */
+.custom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--custom-header-padding-top) var(--custom-header-padding-horizontal) var(--custom-header-padding-bottom);
+  position: relative;
+  flex-wrap: nowrap; /* verhindert Umbruch */
+  overflow: visible; /* verhindert Clipping */
+}
+
+/* Logo-Zeile fixieren (Headerhöhe bleibt konstant) */
+.custom-header__logo-wrapper {
+  z-index: 3;
+  transform: translate(var(--custom-header-logo-x), var(--custom-header-logo-y));
+  height: var(--custom-header-logo-fixed-height);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Link immer auf Logozeilenhöhe ausrichten */
+.custom-header__logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+.custom-header__logo-image {
+  height: var(--custom-header-logo-fixed-height) !important;
+  width: auto !important;
+  max-height: none !important;
+  max-width: none;
+  display: block;
+  object-fit: contain;
+}
+
+/* Textlogo passt in die Zeilenhöhe */
+.custom-header__logo-text {
+  font-size: var(--custom-header-logo-text-size);
+  font-weight: 700;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  height: var(--custom-header-logo-fixed-height);
+  line-height: 1;
+}
+
+/* Navigation */
+.custom-header__nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translate(var(--custom-header-menu-x), var(--custom-header-menu-y));
+  z-index: 2;
+  white-space: nowrap; /* kein Umbruch */
+}
+
+.custom-header__menu {
+  display: flex;
+  gap: var(--custom-header-menu-spacing);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  flex-wrap: nowrap; /* kein Umbruch */
+}
+
+.custom-header__menu li {
+  margin: 0;
+  padding: 0;
+}
+
+.custom-header__menu-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: var(--custom-header-menu-weight);
+  padding: 8px 12px;
+  transition: color 0.2s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.custom-header__menu-link:hover {
+  color: var(--custom-header-menu-hover-color);
+}
+
+.custom-header__menu-link--active {
+  color: var(--custom-header-menu-active-color);
+}
+
+/* Icons Section */
+.custom-header__icons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  z-index: 3;
+  flex-shrink: 0; /* verhindert dass Icons gestaucht werden */
+}
+
+.custom-header__icon {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.custom-header__icon:hover {
+  opacity: 0.7;
+}
+
+.custom-header__icon .svg-wrapper {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.custom-header__icon .svg-wrapper svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Cart Count Bubble */
+.cart-count-bubble {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--custom-header-cart-bubble-color);
+  color: #ffffff;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.cart-count-bubble span[aria-hidden="true"] {
+  display: block;
+}
+
+/* Mobile Menu Button */
+.custom-header__mobile-menu {
+  display: none;
+  margin-left: -1.2rem;
+}
+
+/* Visually Hidden (Accessibility) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Header Drawer (Mobile) */
+header-drawer {
+  margin-left: -1.2rem;
+}
+
+/* ===============================================
+   RESPONSIVE STYLES
+   =============================================== */
+
+/* Tablet and Mobile */
+@media screen and (max-width: 989px) {
+  .custom-header__nav {
+    display: none;
+  }
+
+  .custom-header__mobile-menu {
+    display: block;
+  }
+
+  header-drawer {
+    display: block;
+  }
+
+  .custom-header__logo-wrapper {
+    flex: 1;
+  }
+
+  .custom-header__icons {
+    gap: 15px;
+  }
+}
+
+/* Desktop Only */
+@media screen and (min-width: 990px) {
+  header-drawer {
+    display: none;
+  }
+
+  .custom-header__mobile-menu {
+    display: none;
+  }
+}
+
+/* Small Mobile */
+@media screen and (max-width: 749px) {
+  .custom-header {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .custom-header__icons {
+    gap: 12px;
+  }
+
+  .custom-header__icon .svg-wrapper {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ===============================================
+   HEADER WRAPPER (Sticky + Hintergrund fix)
+   =============================================== */
+
+/* Sticky Wrapper – oben fix */
+.custom-header-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  /* WICHTIG: Hintergrundfarbe aus Farbschema, damit er beim Scrollen nicht transparent wirkt */
+  background-color: rgb(var(--color-background)) !important;
+  /* falls ein Gradient aktiv ist, bleibt der bestehen; die bg-color ist Fallback */
+  background-clip: padding-box;
+}
+
+/* wenn Dawn-JS die Sticky-Klasse setzt, ebenfalls Farbe sicherstellen */
+.section-header.shopify-section-header-sticky,
+.shopify-section-header-sticky.custom-header-wrapper {
+  background-color: rgb(var(--color-background)) !important;
+}
+
+.custom-header-wrapper.header-wrapper--border-bottom {
+  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.08);
+}
+
+/* ===============================================
+   SEARCH MODAL INTEGRATION
+   =============================================== */
+
+.custom-header__icon--search {
+  position: relative;
+}
+
+details-modal.header__search {
+  display: inline-block;
+}
+
+/* ===============================================
+   ACCOUNT ICON
+   =============================================== */
+
+.custom-header__icon--account account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-header__icon--account .customer-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ===============================================
+   FOCUS STYLES (Accessibility)
+   =============================================== */
+
+.custom-header__menu-link:focus-visible,
+.custom-header__icon:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.3rem;
+  box-shadow: 0 0 0 0.3rem rgb(var(--color-background)),
+    0 0 0.5rem 0.4rem rgba(var(--color-foreground), 0.3);
+}
+
+/* ===============================================
+   ANIMATIONS
+   =============================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .custom-header__menu-link {
+    transition: color 0.2s ease, transform 0.1s ease;
+  }
+
+  .custom-header__menu-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .custom-header__icon {
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+
+  .custom-header__icon:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* ===============================================
+   CUSTOM PROPERTIES DEFAULTS
+   =============================================== */
+
+:root {
+  --custom-header-padding-top: 20px;
+  --custom-header-padding-bottom: 20px;
+  --custom-header-padding-horizontal: 50px;
+
+  /* Logo: fixe Zeilenhöhe wie bei Dawn */
+  --custom-header-logo-fixed-height: 48px;
+
+  --custom-header-logo-width: 150px;
+  --custom-header-logo-text-size: 24px;
+  --custom-header-logo-x: 0px;
+  --custom-header-logo-y: 0px;
+
+  /* Menü */
+  --custom-header-menu-spacing: 20px;
+  --custom-header-menu-weight: 400;
+  --custom-header-menu-hover-color: #000000;
+  --custom-header-menu-active-color: #000000;
+  --custom-header-menu-x: 0px;
+  --custom-header-menu-y: 0px;
+
+  /* Cart Bubble */
+  --custom-header-cart-bubble-color: #000000;
+}

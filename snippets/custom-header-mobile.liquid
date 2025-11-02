@@ -1,0 +1,59 @@
+{% comment %}
+  Custom Mobile Header Drawer
+  Für Mobilgeräte (unter 990px)
+{% endcomment %}
+
+<header-drawer data-breakpoint="tablet">
+  <details id="Details-custom-menu-drawer" class="menu-drawer-container">
+    <summary
+      class="header__icon header__icon--menu header__icon--summary link focus-inset custom-header__mobile-menu"
+      aria-label="{{ 'sections.header.menu' | t }}"
+    >
+      <span>
+        {{- 'icon-hamburger.svg' | inline_asset_content -}}
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+    
+    <div id="custom-menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.color_scheme }}">
+      <div class="menu-drawer__inner-container">
+        <div class="menu-drawer__navigation-container">
+          <nav class="menu-drawer__navigation">
+            <ul class="menu-drawer__menu list-menu" role="list">
+              {%- for link in section.settings.menu.links -%}
+                <li>
+                  <a
+                    href="{{ link.url }}"
+                    class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.active or link.child_active %} menu-drawer__menu-item--active{% endif %}"
+                    {% if link.current %}aria-current="page"{% endif %}
+                  >
+                    {{ link.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+          
+          <div class="menu-drawer__utility-links">
+            {%- if section.settings.enable_account and shop.customer_accounts_enabled -%}
+              <a
+                href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+                class="menu-drawer__account link focus-inset h5"
+                rel="nofollow"
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-account.svg' | inline_asset_content -}}
+                </span>
+                {%- if customer -%}
+                  {{ 'customer.account_fallback' | t }}
+                {%- else -%}
+                  {{ 'customer.log_in' | t }}
+                {%- endif -%}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+</header-drawer>

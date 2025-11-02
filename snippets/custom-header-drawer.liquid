@@ -1,0 +1,25 @@
+<details class="menu-drawer-container">
+  <summary class="header__icon header__icon--menu header__icon--summary link focus-inset large-up-hide" aria-label="{{ 'sections.header.menu' | t }}">
+    <span>
+      {{ 'icon-hamburger.svg' | asset_url | img_tag: 'Menu', 'icon' }}
+      {{ 'icon-close.svg' | asset_url | img_tag: 'Close menu', 'icon' }}
+    </span>
+  </summary>
+  <div id="menu-drawer" class="menu-drawer motion-reduce">
+    <div class="menu-drawer__inner-container">
+      <div class="menu-drawer__navigation-container">
+        <nav class="menu-drawer__navigation">
+          <ul class="menu-drawer__menu list-menu" role="list">
+            {% for link in section.settings.menu.links %}
+              <li>
+                <a href="{{ link.url }}" class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.active %} menu-drawer__menu-item--active{% endif %}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</details>
